@@ -1,0 +1,16 @@
+com/supermarket/dto/StockDTO.class
+com/supermarket/dto/ProductDTO.class
+com/supermarket/exception/GlobalExceptionHandler.class
+com/supermarket/common/Result.class
+com/supermarket/service/impl/ProductServiceImpl.class
+com/supermarket/repository/ProductRepository.class
+com/supermarket/entity/Category.class
+com/supermarket/repository/CategoryRepository.class
+com/supermarket/controller/CategoryController.class
+com/supermarket/entity/Product.class
+com/supermarket/config/CorsConfig.class
+com/supermarket/InventoryManagementApplication.class
+com/supermarket/controller/ProductController.class
+com/supermarket/service/impl/CategoryServiceImpl.class
+com/supermarket/service/ProductService.class
+com/supermarket/service/CategoryService.class

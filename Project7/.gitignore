@@ -1,0 +1,10 @@
+apps
+node_modules
+dist
+.build
+.next
+out
+.env
+.env.local
+*.log
+.DS_Store

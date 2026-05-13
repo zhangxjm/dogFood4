@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - GIN_MODE=release
+      - DB_PATH=/app/data/dormitory.db
+    networks:
+      - dorm-network
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3001:80"
+    depends_on:
+      - backend
+    networks:
+      - dorm-network
+
+networks:
+  dorm-network:
+    driver: bridge
+
+volumes:
+  data:

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>个人记账本</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>💰 个人记账本</h1>
+    </header>
+    
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="record">记账</button>
+      <button class="tab-btn" data-tab="flow">当月流水</button>
+      <button class="tab-btn" data-tab="history">历史查询</button>
+    </nav>
+
+    <div class="tab-content" id="record-tab">
+      <div class="card">
+        <h2>新增记录</h2>
+        <div class="type-toggle">
+          <button class="type-btn active" data-type="expense">支出</button>
+          <button class="type-btn" data-type="income">收入</button>
+        </div>
+        <form id="record-form">
+          <div class="form-group">
+            <label>金额</label>
+            <input type="number" id="amount" step="0.01" required placeholder="请输入金额">
+          </div>
+          <div class="form-group">
+            <label>分类</label>
+            <div class="category-list" id="category-list"></div>
+            <input type="hidden" id="category" required>
+          </div>
+          <div class="form-group">
+            <label>日期</label>
+            <input type="date" id="date" required>
+          </div>
+          <div class="form-group">
+            <label>备注</label>
+            <input type="text" id="description" placeholder="可选">
+          </div>
+          <button type="submit" class="btn-primary">保存记录</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="tab-content" id="flow-tab" style="display:none">
+      <div class="card summary">
+        <div class="summary-item income">
+          <span>本月收入</span>
+          <strong id="month-income">¥0.00</strong>
+        </div>
+        <div class="summary-item expense">
+          <span>本月支出</span>
+          <strong id="month-expense">¥0.00</strong>
+        </div>
+        <div class="summary-item balance">
+          <span>本月结余</span>
+          <strong id="month-balance">¥0.00</strong>
+        </div>
+      </div>
+      
+      <div class="card">
+        <h3>分类统计</h3>
+        <div id="category-stats" class="category-stats"></div>
+      </div>
+      
+      <div class="card">
+        <h3>本月流水</h3>
+        <div id="month-records" class="records-list"></div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="history-tab" style="display:none">
+      <div class="card">
+        <h2>历史记录查询</h2>
+        <form id="history-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label>开始日期</label>
+              <input type="date" id="start-date">
+            </div>
+            <div class="form-group">
+              <label>结束日期</label>
+              <input type="date" id="end-date">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>类型</label>
+            <select id="filter-type">
+              <option value="">全部</option>
+              <option value="income">收入</option>
+              <option value="expense">支出</option>
+            </select>
+          </div>
+          <button type="submit" class="btn-primary">查询</button>
+        </form>
+      </div>
+      <div class="card">
+        <h3>查询结果</h3>
+        <div id="history-records" class="records-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+  
+  <script src="app.js"></script>
+</body>
+</html>

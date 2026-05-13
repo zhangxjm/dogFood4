@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  express-station:
+    build: .
+    container_name: express-station
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    restart: unless-stopped

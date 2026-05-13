@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6.0
+    container_name: bookmark-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+      MONGO_INITDB_DATABASE: bookmark
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - bookmark-network
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: bookmark-server
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://admin:admin123@mongodb:27017/bookmark?authSource=admin
+      - PORT=3000
+    depends_on:
+      - mongodb
+    networks:
+      - bookmark-network
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: bookmark-client
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      - server
+    networks:
+      - bookmark-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  bookmark-network:
+    driver: bridge

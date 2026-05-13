@@ -1,0 +1,121 @@
+{{template "header.html" .}}
+
+<div class="page-header">
+  <h2>签到签退</h2>
+  <a href="/attendance/records" class="btn btn-info">📊 查看出勤记录</a>
+</div>
+
+{{if .error}}
+<div class="alert alert-danger">{{.error}}</div>
+{{end}} {{if .workers}}
+<div class="attendance-container">
+  <div class="attendance-section">
+    <h3>上班签到</h3>
+    <form action="/attendance/checkin" method="POST" class="form">
+      <div class="form-group">
+        <label for="checkin_worker"
+          >选择工人 <span class="required">*</span></label
+        >
+        <select id="checkin_worker" name="worker_id" required>
+          <option value="">请选择工人</option>
+          {{range .workers}}
+          <option value="{{.ID}}">{{.WorkerNo}} - {{.Name}}</option>
+          {{end}}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="checkin_date">日期 <span class="required">*</span></label>
+        <input
+          type="date"
+          id="checkin_date"
+          name="date"
+          value="{{.today}}"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="checkin_time">签到时间</label>
+        <input type="time" id="checkin_time" name="check_in" />
+      </div>
+
+      <div class="form-group">
+        <label for="checkin_status">状态</label>
+        <select id="checkin_status" name="status">
+          <option value="正常">正常</option>
+          <option value="迟到">迟到</option>
+          <option value="请假">请假</option>
+          <option value="旷工">旷工</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="checkin_remark">备注</label>
+        <textarea id="checkin_remark" name="remark" rows="2"></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-success btn-lg">✅ 签到</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="attendance-section">
+    <h3>下班签退</h3>
+    <form action="/attendance/checkout" method="POST" class="form">
+      <div class="form-group">
+        <label for="checkout_worker"
+          >选择工人 <span class="required">*</span></label
+        >
+        <select id="checkout_worker" name="worker_id" required>
+          <option value="">请选择工人</option>
+          {{range .workers}}
+          <option value="{{.ID}}">{{.WorkerNo}} - {{.Name}}</option>
+          {{end}}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="checkout_date">日期 <span class="required">*</span></label>
+        <input
+          type="date"
+          id="checkout_date"
+          name="date"
+          value="{{.today}}"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="checkout_time">签退时间</label>
+        <input type="time" id="checkout_time" name="check_out" />
+      </div>
+
+      <div class="form-group">
+        <label for="checkout_status">状态</label>
+        <select id="checkout_status" name="status">
+          <option value="">不修改</option>
+          <option value="正常">正常</option>
+          <option value="早退">早退</option>
+          <option value="加班">加班</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="checkout_remark">备注</label>
+        <textarea id="checkout_remark" name="remark" rows="2"></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-warning btn-lg">🏁 签退</button>
+      </div>
+    </form>
+  </div>
+</div>
+{{else}}
+<div class="empty-state">
+  <p>暂无工人，请先添加工人信息</p>
+  <a href="/workers/create" class="btn btn-primary">添加工人</a>
+</div>
+{{end}} {{template "footer.html"}}

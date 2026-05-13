@@ -1,0 +1,39 @@
+{
+  "name": "宠物店管理系统",
+  "appid": "__UNI__PETSHOP",
+  "description": "宠物店基础档案管理系统",
+  "versionName": "1.0.0",
+  "versionCode": "100",
+  "transformPx": false,
+  "app-plus": {
+    "usingComponents": true,
+    "nvueStyleCompiler": "uni-app",
+    "compilerVersion": 3
+  },
+  "h5": {
+    "title": "宠物店管理系统",
+    "router": {
+      "mode": "hash"
+    },
+    "devServer": {
+      "port": 8081
+    }
+  },
+  "quickapp": {},
+  "mp-weixin": {
+    "appid": "",
+    "setting": {
+      "urlCheck": false
+    },
+    "usingComponents": true
+  },
+  "mp-alipay": {
+    "usingComponents": true
+  },
+  "mp-baidu": {
+    "usingComponents": true
+  },
+  "mp-toutiao": {
+    "usingComponents": true
+  }
+}

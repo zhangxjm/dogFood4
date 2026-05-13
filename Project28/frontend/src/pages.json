@@ -1,0 +1,76 @@
+{
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "宠物店管理系统"
+      }
+    },
+    {
+      "path": "pages/pets/pets",
+      "style": {
+        "navigationBarTitleText": "宠物列表"
+      }
+    },
+    {
+      "path": "pages/pets/edit",
+      "style": {
+        "navigationBarTitleText": "宠物信息"
+      }
+    },
+    {
+      "path": "pages/owners/owners",
+      "style": {
+        "navigationBarTitleText": "主人列表"
+      }
+    },
+    {
+      "path": "pages/owners/edit",
+      "style": {
+        "navigationBarTitleText": "主人信息"
+      }
+    },
+    {
+      "path": "pages/vaccines/vaccines",
+      "style": {
+        "navigationBarTitleText": "疫苗记录"
+      }
+    },
+    {
+      "path": "pages/search/search",
+      "style": {
+        "navigationBarTitleText": "信息查询"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "宠物店管理",
+    "navigationBarBackgroundColor": "#007AFF",
+    "backgroundColor": "#F5F5F5"
+  },
+  "tabBar": {
+    "color": "#7A7E83",
+    "selectedColor": "#007AFF",
+    "borderStyle": "black",
+    "backgroundColor": "#F8F8F8",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/pets/pets",
+        "text": "宠物"
+      },
+      {
+        "pagePath": "pages/owners/owners",
+        "text": "主人"
+      },
+      {
+        "pagePath": "pages/search/search",
+        "text": "查询"
+      }
+    ]
+  }
+}

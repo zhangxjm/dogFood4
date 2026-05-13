@@ -1,0 +1,30 @@
+{
+  "name": "oa-approval-system",
+  "version": "1.0.0",
+  "description": "Node.js NestJS + NextJS SSR 全栈 OA 审批系统",
+  "scripts": {
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "dev:backend": "cd backend && npm run start:dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "start:backend": "cd backend && npm run start:prod",
+    "start:frontend": "cd frontend && npm run start",
+    "dev": "concurrently \"npm run docker:up\" \"npm run dev:backend\" \"npm run dev:frontend\""
+  },
+  "keywords": [
+    "nestjs",
+    "nextjs",
+    "mongodb",
+    "redis",
+    "oa",
+    "approval"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}

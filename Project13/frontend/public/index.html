@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>社区小超市库存管理系统</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/element-ui/lib/theme-chalk/index.css"
+    />
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      .el-header {
+        background-color: #409eff;
+        color: #fff;
+        text-align: center;
+        line-height: 60px;
+        font-size: 20px;
+        font-weight: bold;
+      }
+      .main-container {
+        padding: 20px;
+      }
+      .search-bar {
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <el-container>
+        <el-header>社区小超市库存管理系统</el-header>
+        <el-container>
+          <el-aside width="200px">
+            <el-menu
+              :default-active="activeMenu"
+              @select="handleMenuSelect"
+              background-color="#545c64"
+              text-color="#fff"
+              active-text-color="#ffd04b"
+              style="height: 100vh"
+            >
+              <el-menu-item index="product">
+                <i class="el-icon-goods"></i>
+                <span slot="title">商品管理</span>
+              </el-menu-item>
+              <el-menu-item index="category">
+                <i class="el-icon-menu"></i>
+                <span slot="title">分类管理</span>
+              </el-menu-item>
+            </el-menu>
+          </el-aside>
+          <el-main class="main-container">
+            <div v-if="activeMenu === 'product'">
+              <el-card>
+                <div slot="header">
+                  <span>商品列表</span>
+                  <el-button
+                    style="float: right; padding: 3px 0"
+                    type="primary"
+                    @click="openProductDialog"
+                  >
+                    新增商品
+                  </el-button>
+                </div>
+                <div class="search-bar">
+                  <el-input
+                    v-model="searchForm.name"
+                    placeholder="搜索商品名称"
+                    style="width: 200px"
+                    @keyup.enter.native="searchProducts"
+                    clearable
+                  ></el-input>
+                  <el-select
+                    v-model="searchForm.categoryId"
+                    placeholder="选择分类"
+                    style="width: 150px; margin-left: 10px"
+                    clearable
+                  >
+                    <el-option
+                      v-for="cat in categories"
+                      :key="cat.id"
+                      :label="cat.name"
+                      :value="cat.id"
+                    ></el-option>
+                  </el-select>
+                  <el-button
+                    type="primary"
+                    @click="searchProducts"
+                    style="margin-left: 10px"
+                    >查询</el-button
+                  >
+                </div>
+                <el-table :data="productList" border style="width: 100%">
+                  <el-table-column
+                    prop="id"
+                    label="ID"
+                    width="80"
+                  ></el-table-column>
+                  <el-table-column
+                    prop="name"
+                    label="商品名称"
+                    width="150"
+                  ></el-table-column>
+                  <el-table-column
+                    prop="code"
+                    label="商品编码"
+                    width="120"
+                  ></el-table-column>
+                  <el-table-column label="分类" width="120">
+                    <template slot-scope="scope">
+                      {{ scope.row.category ? scope.row.category.name : '未分类'
+                      }}
+                    </template>
+                  </el-table-column>
+                  <el-table-column prop="price" label="单价" width="100">
+                    <template slot-scope="scope">
+                      ¥{{ scope.row.price ? scope.row.price.toFixed(2) : '0.00'
+                      }}
+                    </template>
+                  </el-table-column>
+                  <el-table-column prop="stock" label="库存数量" width="100">
+                    <template slot-scope="scope">
+                      <el-tag
+                        :type="scope.row.stock <= 0 ? 'danger' : (scope.row.stock < 10 ? 'warning' : 'success')"
+                      >
+                        {{ scope.row.stock }}
+                      </el-tag>
+                    </template>
+                  </el-table-column>
+                  <el-table-column
+                    prop="unit"
+                    label="单位"
+                    width="80"
+                  ></el-table-column>
+                  <el-table-column
+                    prop="description"
+                    label="描述"
+                  ></el-table-column>
+                  <el-table-column label="操作" width="280">
+                    <template slot-scope="scope">
+                      <el-button
+                        size="mini"
+                        type="primary"
+                        @click="openStockDialog(scope.row)"
+                        >库存调整</el-button
+                      >
+                      <el-button
+                        size="mini"
+                        @click="openProductDialog(scope.row)"
+                        >编辑</el-button
+                      >
+                      <el-button
+                        size="mini"
+                        type="danger"
+                        @click="deleteProduct(scope.row)"
+                        >删除</el-button
+                      >
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </el-card>
+            </div>
+
+            <div v-if="activeMenu === 'category'">
+              <el-card>
+                <div slot="header">
+                  <span>分类列表</span>
+                  <el-button
+                    style="float: right; padding: 3px 0"
+                    type="primary"
+                    @click="openCategoryDialog"
+                  >
+                    新增分类
+                  </el-button>
+                </div>
+                <el-table :data="categories" border style="width: 100%">
+                  <el-table-column
+                    prop="id"
+                    label="ID"
+                    width="100"
+                  ></el-table-column>
+                  <el-table-column
+                    prop="name"
+                    label="分类名称"
+                    width="200"
+                  ></el-table-column>
+                  <el-table-column
+                    prop="description"
+                    label="描述"
+                  ></el-table-column>
+                  <el-table-column label="操作" width="200">
+                    <template slot-scope="scope">
+                      <el-button
+                        size="mini"
+                        @click="openCategoryDialog(scope.row)"
+                        >编辑</el-button
+                      >
+                      <el-button
+                        size="mini"
+                        type="danger"
+                        @click="deleteCategory(scope.row)"
+                        >删除</el-button
+                      >
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </el-card>
+            </div>
+          </el-main>
+        </el-container>
+      </el-container>
+
+      <el-dialog
+        :title="productForm.id ? '编辑商品' : '新增商品'"
+        :visible.sync="productDialogVisible"
+        width="500px"
+      >
+        <el-form :model="productForm" label-width="80px">
+          <el-form-item label="商品名称">
+            <el-input
+              v-model="productForm.name"
+              placeholder="请输入商品名称"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="商品编码">
+            <el-input
+              v-model="productForm.code"
+              placeholder="请输入商品编码"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="商品分类">
+            <el-select
+              v-model="productForm.categoryId"
+              placeholder="请选择分类"
+              style="width: 100%"
+            >
+              <el-option
+                v-for="cat in categories"
+                :key="cat.id"
+                :label="cat.name"
+                :value="cat.id"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="单价">
+            <el-input-number
+              v-model="productForm.price"
+              :precision="2"
+              :step="0.01"
+              :min="0"
+              style="width: 100%"
+            ></el-input-number>
+          </el-form-item>
+          <el-form-item label="库存数量">
+            <el-input-number
+              v-model="productForm.stock"
+              :min="0"
+              style="width: 100%"
+            ></el-input-number>
+          </el-form-item>
+          <el-form-item label="单位">
+            <el-input
+              v-model="productForm.unit"
+              placeholder="例如：个、瓶、箱"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="描述">
+            <el-input
+              v-model="productForm.description"
+              type="textarea"
+              rows="3"
+            ></el-input>
+          </el-form-item>
+        </el-form>
+        <span slot="footer">
+          <el-button @click="productDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="saveProduct">确定</el-button>
+        </span>
+      </el-dialog>
+
+      <el-dialog
+        title="库存调整"
+        :visible.sync="stockDialogVisible"
+        width="400px"
+      >
+        <el-form label-width="100px">
+          <el-form-item label="当前商品">
+            <span>{{ currentProduct ? currentProduct.name : '' }}</span>
+          </el-form-item>
+          <el-form-item label="当前库存">
+            <el-tag>{{ currentProduct ? currentProduct.stock : 0 }}</el-tag>
+          </el-form-item>
+          <el-form-item label="调整数量">
+            <el-input-number
+              v-model="stockQuantity"
+              :step="1"
+              style="width: 100%"
+              placeholder="正数增加，负数减少"
+            ></el-input-number>
+            <span style="color: #999; font-size: 12px"
+              >正数表示增加，负数表示减少</span
+            >
+          </el-form-item>
+        </el-form>
+        <span slot="footer">
+          <el-button @click="stockDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="saveStock">确定</el-button>
+        </span>
+      </el-dialog>
+
+      <el-dialog
+        :title="categoryForm.id ? '编辑分类' : '新增分类'"
+        :visible.sync="categoryDialogVisible"
+        width="400px"
+      >
+        <el-form :model="categoryForm" label-width="80px">
+          <el-form-item label="分类名称">
+            <el-input
+              v-model="categoryForm.name"
+              placeholder="请输入分类名称"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="描述">
+            <el-input
+              v-model="categoryForm.description"
+              type="textarea"
+              rows="3"
+            ></el-input>
+          </el-form-item>
+        </el-form>
+        <span slot="footer">
+          <el-button @click="categoryDialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="saveCategory">确定</el-button>
+        </span>
+      </el-dialog>
+    </div>
+
+    <script src="https://unpkg.com/vue@2.7.14/dist/vue.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>

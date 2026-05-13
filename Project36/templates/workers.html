@@ -1,0 +1,48 @@
+{{template "header.html" .}}
+
+<div class="page-header">
+  <h2>工人管理</h2>
+  <a href="/workers/create" class="btn btn-primary">➕ 添加工人</a>
+</div>
+
+{{if .workers}}
+<table class="table">
+  <thead>
+    <tr>
+      <th>工号</th>
+      <th>姓名</th>
+      <th>电话</th>
+      <th>部门</th>
+      <th>岗位</th>
+      <th>注册时间</th>
+      <th>操作</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{range .workers}}
+    <tr>
+      <td>{{.WorkerNo}}</td>
+      <td>{{.Name}}</td>
+      <td>{{.Phone}}</td>
+      <td>{{.Department}}</td>
+      <td>{{.Position}}</td>
+      <td>{{.CreatedAt.Format "2006-01-02"}}</td>
+      <td class="actions">
+        <a href="/workers/edit/{{.ID}}" class="btn btn-sm btn-info">编辑</a>
+        <a
+          href="/workers/delete/{{.ID}}"
+          class="btn btn-sm btn-danger"
+          onclick="return confirm('确定要删除该工人吗？');"
+          >删除</a
+        >
+      </td>
+    </tr>
+    {{end}}
+  </tbody>
+</table>
+{{else}}
+<div class="empty-state">
+  <p>暂无工人信息</p>
+  <a href="/workers/create" class="btn btn-primary">添加第一个工人</a>
+</div>
+{{end}} {{template "footer.html"}}

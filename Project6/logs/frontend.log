@@ -1,0 +1,13 @@
+
+> erp-web@1.0.0 dev
+> vite
+
+Port 3000 is in use, trying another one...
+Port 3001 is in use, trying another one...
+
+  VITE v4.5.14  ready in 209 ms
+
+  ➜  Local:   http://localhost:3002/
+  ➜  Network: use --host to expose
+(node:14891) [DEP0060] DeprecationWarning: The `util._extend` API is deprecated. Please use Object.assign() instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)

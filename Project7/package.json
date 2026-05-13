@@ -1,0 +1,9 @@
+{
+  "name": "doc-collab",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down"
+  }
+}

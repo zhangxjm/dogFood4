@@ -1,0 +1,71 @@
+{{template "header.html" .}}
+
+<div class="page-header">
+  <h2>{{if .worker}}编辑工人{{else}}添加工人{{end}}</h2>
+  <a href="/workers" class="btn btn-secondary">返回列表</a>
+</div>
+
+{{if .error}}
+<div class="alert alert-danger">{{.error}}</div>
+{{end}}
+
+<form action="{{.action}}" method="POST" class="form">
+  <div class="form-group">
+    <label for="name">姓名 <span class="required">*</span></label>
+    <input
+      type="text"
+      id="name"
+      name="name"
+      value="{{if .worker}}{{.worker.Name}}{{end}}"
+      required
+    />
+  </div>
+
+  <div class="form-group">
+    <label for="worker_no">工号 <span class="required">*</span></label>
+    <input
+      type="text"
+      id="worker_no"
+      name="worker_no"
+      value="{{if .worker}}{{.worker.WorkerNo}}{{end}}"
+      required
+    />
+  </div>
+
+  <div class="form-group">
+    <label for="phone">电话</label>
+    <input
+      type="tel"
+      id="phone"
+      name="phone"
+      value="{{if .worker}}{{.worker.Phone}}{{end}}"
+    />
+  </div>
+
+  <div class="form-group">
+    <label for="department">部门</label>
+    <input
+      type="text"
+      id="department"
+      name="department"
+      value="{{if .worker}}{{.worker.Department}}{{end}}"
+    />
+  </div>
+
+  <div class="form-group">
+    <label for="position">岗位</label>
+    <input
+      type="text"
+      id="position"
+      name="position"
+      value="{{if .worker}}{{.worker.Position}}{{end}}"
+    />
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">保存</button>
+    <a href="/workers" class="btn btn-secondary">取消</a>
+  </div>
+</form>
+
+{{template "footer.html"}}

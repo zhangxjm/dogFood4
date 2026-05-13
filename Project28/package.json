@@ -1,0 +1,22 @@
+{
+  "name": "petshop-management",
+  "version": "1.0.0",
+  "description": "宠物店管理系统 - Gin + Uniapp + SQLite",
+  "scripts": {
+    "install:backend": "cd backend && go mod tidy",
+    "install:frontend": "cd frontend && npm install",
+    "install": "npm run install:backend && npm run install:frontend",
+    "dev:backend": "cd backend && go run main.go",
+    "dev:frontend": "cd frontend && npm run dev:h5",
+    "build:frontend": "cd frontend && npm run build:h5",
+    "start": "./start.sh"
+  },
+  "keywords": [
+    "petshop",
+    "gin",
+    "uniapp",
+    "sqlite"
+  ],
+  "author": "",
+  "license": "MIT"
+}

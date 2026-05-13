@@ -1,0 +1,90 @@
+{{template "header.html" .}}
+
+<div class="page-header">
+    <h2>出勤记录</h2>
+</div>
+
+<div class="filter-form">
+    <form method="GET" action="/attendance/records" class="form-inline">
+        <div class="form-group">
+            <label>开始日期</label>
+            <input type="date" name="start_date" value="{{.start_date}}">
+        </div>
+        <div class="form-group">
+            <label>结束日期</label>
+            <input type="date" name="end_date" value="{{.end_date}}">
+        </div>
+        <div class="form-group">
+            <label>工人</label>
+            <select name="worker_id">
+                <option value="0">全部工人</option>
+                {{range .workers}}
+                <option value="{{.ID}}">{{.WorkerNo}} - {{.Name}}</option>
+                {{end}}
+            </select>
+        </div>
+        <div class="form-group">
+            <label>状态</label>
+            <select name="status">
+                <option value="all">全部状态</option>
+                <option value="正常" {{if eq .status "正常"}}selected{{end}}>正常</option>
+                <option value="迟到" {{if eq .status "迟到"}}selected{{end}}>迟到</option>
+                <option value="早退" {{if eq .status "早退"}}selected{{end}}>早退</option>
+                <option value="加班" {{if eq .status "加班"}}selected{{end}}>加班</option>
+                <option value="请假" {{if eq .status "请假"}}selected{{end}}>请假</option>
+                <option value="旷工" {{if eq .status "旷工"}}selected{{end}}>旷工</option>
+            </select>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">🔍 查询</button>
+            <a href="/attendance/records" class="btn btn-secondary">重置</a>
+        </div>
+    </form>
+</div>
+
+{{if .records}}
+<div class="records-summary">
+    <p>共找到 <strong>{{len .records}}</strong> 条记录</p>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>日期</th>
+            <th>工号</th>
+            <th>姓名</th>
+            <th>签到</th>
+            <th>签退</th>
+            <th>状态</th>
+            <th>备注</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{range .records}}
+        <tr>
+            <td>{{.Date.Format "2006-01-02"}}</td>
+            <td>{{.Worker.WorkerNo}}</td>
+            <td>{{.Worker.Name}}</td>
+            <td>{{if .CheckIn}}{{.CheckIn}}{{else}}-{{end}}</td>
+            <td>{{if .CheckOut}}{{.CheckOut}}{{else}}-{{end}}</td>
+            <td>
+                <span class="status status-{{.Status}}">{{.Status}}</span>
+            </td>
+            <td>{{.Remark}}</td>
+            <td class="actions">
+                <a href="/attendance/records/edit/{{.ID}}" class="btn btn-sm btn-info">编辑</a>
+                <a href="/attendance/records/delete/{{.ID}}" class="btn btn-sm btn-danger" onclick="return confirm('确定要删除该记录吗？')">删除</a>
+            </td>
+        </tr>
+        {{end}}
+    </tbody>
+</table>
+{{else}}
+<div class="empty-state">
+    <p>暂无出勤记录</p>
+    <a href="/attendance" class="btn btn-primary">去签到</a>
+</div>
+{{end}}
+
+{{template "footer.html"}}

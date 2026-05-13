@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高校社团管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #4e73df 0%, #224abe 100%);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 12px 20px;
+            margin: 4px 10px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: rgba(255,255,255,0.15);
+            color: white;
+        }
+        .sidebar .nav-link i {
+            margin-right: 10px;
+        }
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58,59,69,0.1);
+        }
+        .stat-card {
+            border-left: 4px solid;
+        }
+        .stat-card.blue { border-left-color: #4e73df; }
+        .stat-card.green { border-left-color: #1cc88a; }
+        .stat-card.orange { border-left-color: #f6c23e; }
+        .stat-card.red { border-left-color: #e74a3b; }
+        .table-action-btn {
+            padding: 4px 8px;
+            font-size: 14px;
+        }
+        .modal-body .form-label {
+            font-weight: 500;
+        }
+        .badge-active { background-color: #1cc88a; }
+        .badge-inactive { background-color: #858796; }
+        .search-input {
+            max-width: 300px;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                min-height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-4">
+                    <h5 class="text-white text-center mb-4">
+                        <i class="bi bi-people-fill"></i> 社团管理系统
+                    </h5>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" onclick="showPage('dashboard')">
+                                <i class="bi bi-speedometer2"></i> 数据概览
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showPage('members')">
+                                <i class="bi bi-person-lines-fill"></i> 成员管理
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showPage('departments')">
+                                <i class="bi bi-building"></i> 部门管理
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showPage('transitions')">
+                                <i class="bi bi-arrow-repeat"></i> 换届管理
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+                <div id="page-dashboard">
+                    <h2 class="mb-4">数据概览</h2>
+                    <div class="row g-3 mb-4" id="stats-cards">
+                    </div>
+                    <div class="card">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary"><i class="bi bi-bar-chart"></i> 各部门人数统计</h6>
+                        </div>
+                        <div class="card-body">
+                            <div id="department-stats" class="row g-3">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="page-members" style="display:none;">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>成员管理</h2>
+                        <button class="btn btn-primary" onclick="openMemberModal()">
+                            <i class="bi bi-plus-lg"></i> 添加成员
+                        </button>
+                    </div>
+                    
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <input type="text" id="member-search" class="form-control search-input" placeholder="搜索姓名/学号/专业" onkeyup="searchMembers()">
+                                </div>
+                                <div class="col-md-3">
+                                    <select id="filter-department" class="form-select" onchange="loadMembers()">
+                                        <option value="">全部部门</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <select id="filter-status" class="form-select" onchange="loadMembers()">
+                                        <option value="">全部状态</option>
+                                        <option value="active">在籍</option>
+                                        <option value="inactive">已退出</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>学号</th>
+                                            <th>姓名</th>
+                                            <th>性别</th>
+                                            <th>年级</th>
+                                            <th>专业</th>
+                                            <th>部门</th>
+                                            <th>职位</th>
+                                            <th>状态</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="members-tbody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="page-departments" style="display:none;">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>部门管理</h2>
+                        <button class="btn btn-primary" onclick="openDepartmentModal()">
+                            <i class="bi bi-plus-lg"></i> 添加部门
+                        </button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>部门名称</th>
+                                            <th>描述</th>
+                                            <th>成员数</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="departments-tbody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="page-transitions" style="display:none;">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>换届管理</h2>
+                        <button class="btn btn-primary" onclick="openTransitionModal()">
+                            <i class="bi bi-plus-lg"></i> 新建换届
+                        </button>
+                    </div>
+                    <div id="transitions-list">
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div class="modal fade" id="memberModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="memberModalTitle">添加成员</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="memberForm">
+                        <input type="hidden" id="member-id">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">姓名 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="member-name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">学号 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="member-student-id" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">性别</label>
+                                <select class="form-select" id="member-gender">
+                                    <option value="">请选择</option>
+                                    <option value="男">男</option>
+                                    <option value="女">女</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">年级</label>
+                                <input type="text" class="form-control" id="member-grade" placeholder="如：2024级">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">专业</label>
+                                <input type="text" class="form-control" id="member-major">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">电话</label>
+                                <input type="text" class="form-control" id="member-phone">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">邮箱</label>
+                                <input type="email" class="form-control" id="member-email">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">加入日期</label>
+                                <input type="date" class="form-control" id="member-join-date">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">部门</label>
+                                <select class="form-select" id="member-department">
+                                    <option value="">未分配</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">职位</label>
+                                <input type="text" class="form-control" id="member-position">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">状态</label>
+                                <select class="form-select" id="member-status">
+                                    <option value="active">在籍</option>
+                                    <option value="inactive">已退出</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="saveMember()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="departmentModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="departmentModalTitle">添加部门</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="departmentForm">
+                        <input type="hidden" id="department-id">
+                        <div class="mb-3">
+                            <label class="form-label">部门名称 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="department-name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">部门描述</label>
+                            <textarea class="form-control" id="department-description" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="saveDepartment()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="transitionModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">新建换届</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="transitionForm">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">年份 <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="transition-year" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">学期 <span class="text-danger">*</span></label>
+                                <select class="form-select" id="transition-semester" required>
+                                    <option value="春季学期">春季学期</option>
+                                    <option value="秋季学期">秋季学期</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">描述</label>
+                                <textarea class="form-control" id="transition-description" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="saveTransition()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="recordModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">添加换届记录</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="recordForm">
+                        <input type="hidden" id="record-transition-id">
+                        <div class="mb-3">
+                            <label class="form-label">选择成员 <span class="text-danger">*</span></label>
+                            <select class="form-select" id="record-member" required>
+                            </select>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">新职位</label>
+                                <input type="text" class="form-control" id="record-new-position">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">新部门</label>
+                                <select class="form-select" id="record-new-department">
+                                    <option value="">不变动</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3 mt-3">
+                            <label class="form-label">备注</label>
+                            <textarea class="form-control" id="record-notes" rows="2"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="saveRecord()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div id="toast" class="toast" role="alert">
+            <div class="toast-header">
+                <strong class="me-auto" id="toast-title">提示</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="toast-message"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let departments = [];
+        let members = [];
+        let transitions = [];
+        let currentPage = 'dashboard';
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAll();
+        });
+
+        async function loadAll() {
+            await Promise.all([
+                loadDepartments(),
+                loadMembers(),
+                loadTransitions(),
+                loadStats()
+            ]);
+            populateDepartmentSelects();
+        }
+
+        function showPage(page) {
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => link.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.querySelectorAll('[id^="page-"]').forEach(el => el.style.display = 'none');
+            document.getElementById('page-' + page).style.display = 'block';
+            currentPage = page;
+            
+            if (page === 'dashboard') loadStats();
+        }
+
+        async function apiRequest(url, method = 'GET', data = null) {
+            const options = {
+                method,
+                headers: { 'Content-Type': 'application/json' }
+            };
+            if (data) options.body = JSON.stringify(data);
+            
+            const response = await fetch(url, options);
+            const result = await response.json();
+            
+            if (!response.ok) {
+                showToast('错误', result.error || '操作失败', 'danger');
+                throw new Error(result.error);
+            }
+            return result;
+        }
+
+        function showToast(title, message, type = 'success') {
+            const toast = new bootstrap.Toast(document.getElementById('toast'));
+            document.getElementById('toast-title').textContent = title;
+            document.getElementById('toast-message').textContent = message;
+            document.getElementById('toast').className = `toast text-bg-${type}`;
+            toast.show();
+        }
+
+        async function loadStats() {
+            try {
+                const stats = await apiRequest('/api/stats');
+                const cards = document.getElementById('stats-cards');
+                cards.innerHTML = `
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card stat-card blue p-3">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <div class="text-xs text-primary text-uppercase mb-1">总成员数</div>
+                                    <div class="h3 mb-0">${stats.total_members}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="bi bi-people text-gray-300" style="font-size:2rem;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card stat-card green p-3">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <div class="text-xs text-success text-uppercase mb-1">在籍成员</div>
+                                    <div class="h3 mb-0">${stats.active_members}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="bi bi-person-check text-gray-300" style="font-size:2rem;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card stat-card orange p-3">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <div class="text-xs text-warning text-uppercase mb-1">部门数量</div>
+                                    <div class="h3 mb-0">${stats.total_departments}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="bi bi-building text-gray-300" style="font-size:2rem;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card stat-card red p-3">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <div class="text-xs text-danger text-uppercase mb-1">换届次数</div>
+                                    <div class="h3 mb-0">${stats.total_transitions}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="bi bi-arrow-repeat text-gray-300" style="font-size:2rem;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                const deptStats = document.getElementById('department-stats');
+                if (stats.department_stats.length === 0) {
+                    deptStats.innerHTML = '<div class="col-12 text-center text-muted">暂无部门数据</div>';
+                } else {
+                    const colors = ['bg-primary', 'bg-success', 'bg-info', 'bg-warning', 'bg-danger', 'bg-secondary'];
+                    deptStats.innerHTML = stats.department_stats.map((dept, i) => `
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="mb-0">${dept.name}</h6>
+                                        <span class="badge ${colors[i % colors.length]}">${dept.count}人</span>
+                                    </div>
+                                    <div class="progress" style="height:8px;">
+                                        <div class="progress-bar ${colors[i % colors.length]}" 
+                                             style="width:${stats.active_members ? (dept.count/stats.active_members*100).toFixed(0) : 0}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function loadDepartments() {
+            try {
+                departments = await apiRequest('/api/departments');
+                renderDepartments();
+                populateDepartmentSelects();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function renderDepartments() {
+            const tbody = document.getElementById('departments-tbody');
+            if (departments.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-muted">暂无部门数据</td></tr>';
+                return;
+            }
+            tbody.innerHTML = departments.map(d => `
+                <tr>
+                    <td><strong>${d.name}</strong></td>
+                    <td>${d.description || '-'}</td>
+                    <td><span class="badge bg-primary">${d.member_count}人</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary table-action-btn" onclick="editDepartment(${d.id})">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger table-action-btn" onclick="deleteDepartment(${d.id})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function populateDepartmentSelects() {
+            const options = departments.map(d => `<option value="${d.id}">${d.name}</option>`).join('');
+            const defaultOption = '<option value="">未分配</option>';
+            
+            const memberDept = document.getElementById('member-department');
+            const filterDept = document.getElementById('filter-department');
+            const recordDept = document.getElementById('record-new-department');
+            
+            if (memberDept) memberDept.innerHTML = defaultOption + options;
+            if (filterDept) filterDept.innerHTML = '<option value="">全部部门</option>' + options;
+            if (recordDept) recordDept.innerHTML = '<option value="">不变动</option>' + options;
+        }
+
+        function openDepartmentModal(dept = null) {
+            const modal = new bootstrap.Modal(document.getElementById('departmentModal'));
+            document.getElementById('department-id').value = dept ? dept.id : '';
+            document.getElementById('department-name').value = dept ? dept.name : '';
+            document.getElementById('department-description').value = dept ? (dept.description || '') : '';
+            document.getElementById('departmentModalTitle').textContent = dept ? '编辑部门' : '添加部门';
+            modal.show();
+        }
+
+        function editDepartment(id) {
+            const dept = departments.find(d => d.id === id);
+            openDepartmentModal(dept);
+        }
+
+        async function saveDepartment() {
+            const id = document.getElementById('department-id').value;
+            const data = {
+                name: document.getElementById('department-name').value.trim(),
+                description: document.getElementById('department-description').value.trim()
+            };
+            
+            if (!data.name) {
+                showToast('错误', '部门名称不能为空', 'danger');
+                return;
+            }
+            
+            try {
+                if (id) {
+                    await apiRequest(`/api/departments/${id}`, 'PUT', data);
+                    showToast('成功', '部门已更新');
+                } else {
+                    await apiRequest('/api/departments', 'POST', data);
+                    showToast('成功', '部门已添加');
+                }
+                
+                bootstrap.Modal.getInstance(document.getElementById('departmentModal')).hide();
+                await loadDepartments();
+                await loadStats();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function deleteDepartment(id) {
+            if (!confirm('确定要删除该部门吗？')) return;
+            
+            try {
+                await apiRequest(`/api/departments/${id}`, 'DELETE');
+                showToast('成功', '部门已删除');
+                await loadDepartments();
+                await loadStats();
+                await loadMembers();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function loadMembers() {
+            try {
+                const params = new URLSearchParams();
+                const deptId = document.getElementById('filter-department')?.value;
+                const status = document.getElementById('filter-status')?.value;
+                
+                if (deptId) params.append('department_id', deptId);
+                if (status) params.append('status', status);
+                
+                const url = '/api/members' + (params.toString() ? '?' + params.toString() : '');
+                members = await apiRequest(url);
+                renderMembers();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function searchMembers() {
+            const keyword = document.getElementById('member-search').value.toLowerCase();
+            const tbody = document.getElementById('members-tbody');
+            
+            const filtered = members.filter(m => 
+                m.name.toLowerCase().includes(keyword) ||
+                m.student_id.toLowerCase().includes(keyword) ||
+                (m.major || '').toLowerCase().includes(keyword)
+            );
+            renderMembersList(filtered);
+        }
+
+        function renderMembers() {
+            renderMembersList(members);
+        }
+
+        function renderMembersList(list) {
+            const tbody = document.getElementById('members-tbody');
+            if (list.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-muted">暂无成员数据</td></tr>';
+                return;
+            }
+            tbody.innerHTML = list.map(m => `
+                <tr>
+                    <td>${m.student_id}</td>
+                    <td><strong>${m.name}</strong></td>
+                    <td>${m.gender || '-'}</td>
+                    <td>${m.grade || '-'}</td>
+                    <td>${m.major || '-'}</td>
+                    <td>${m.department_name}</td>
+                    <td>${m.position || '-'}</td>
+                    <td>
+                        <span class="badge ${m.status === 'active' ? 'badge-active' : 'badge-inactive'}">
+                            ${m.status === 'active' ? '在籍' : '已退出'}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary table-action-btn" onclick="editMember(${m.id})">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger table-action-btn" onclick="deleteMember(${m.id})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openMemberModal(member = null) {
+            const modal = new bootstrap.Modal(document.getElementById('memberModal'));
+            document.getElementById('member-id').value = member ? member.id : '';
+            document.getElementById('member-name').value = member ? member.name : '';
+            document.getElementById('member-student-id').value = member ? member.student_id : '';
+            document.getElementById('member-gender').value = member ? (member.gender || '') : '';
+            document.getElementById('member-grade').value = member ? (member.grade || '') : '';
+            document.getElementById('member-major').value = member ? (member.major || '') : '';
+            document.getElementById('member-phone').value = member ? (member.phone || '') : '';
+            document.getElementById('member-email').value = member ? (member.email || '') : '';
+            document.getElementById('member-join-date').value = member ? (member.join_date || '') : '';
+            document.getElementById('member-department').value = member ? (member.department_id || '') : '';
+            document.getElementById('member-position').value = member ? (member.position || '') : '';
+            document.getElementById('member-status').value = member ? (member.status || 'active') : 'active';
+            document.getElementById('memberModalTitle').textContent = member ? '编辑成员' : '添加成员';
+            modal.show();
+        }
+
+        async function editMember(id) {
+            try {
+                const member = await apiRequest(`/api/members/${id}`);
+                openMemberModal(member);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function saveMember() {
+            const id = document.getElementById('member-id').value;
+            const data = {
+                name: document.getElementById('member-name').value.trim(),
+                student_id: document.getElementById('member-student-id').value.trim(),
+                gender: document.getElementById('member-gender').value,
+                grade: document.getElementById('member-grade').value.trim(),
+                major: document.getElementById('member-major').value.trim(),
+                phone: document.getElementById('member-phone').value.trim(),
+                email: document.getElementById('member-email').value.trim(),
+                join_date: document.getElementById('member-join-date').value,
+                department_id: document.getElementById('member-department').value || null,
+                position: document.getElementById('member-position').value.trim(),
+                status: document.getElementById('member-status').value
+            };
+            
+            if (!data.name || !data.student_id) {
+                showToast('错误', '姓名和学号不能为空', 'danger');
+                return;
+            }
+            
+            try {
+                if (id) {
+                    await apiRequest(`/api/members/${id}`, 'PUT', data);
+                    showToast('成功', '成员信息已更新');
+                } else {
+                    await apiRequest('/api/members', 'POST', data);
+                    showToast('成功', '成员已添加');
+                }
+                
+                bootstrap.Modal.getInstance(document.getElementById('memberModal')).hide();
+                await loadMembers();
+                await loadStats();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function deleteMember(id) {
+            if (!confirm('确定要删除该成员吗？')) return;
+            
+            try {
+                await apiRequest(`/api/members/${id}`, 'DELETE');
+                showToast('成功', '成员已删除');
+                await loadMembers();
+                await loadStats();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function loadTransitions() {
+            try {
+                transitions = await apiRequest('/api/transitions');
+                renderTransitions();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function renderTransitions() {
+            const container = document.getElementById('transitions-list');
+            
+            if (transitions.length === 0) {
+                container.innerHTML = '<div class="card p-4 text-center text-muted">暂无换届记录</div>';
+                return;
+            }
+            
+            container.innerHTML = transitions.map(t => `
+                <div class="card mb-3" id="transition-${t.id}">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">
+                            <i class="bi bi-calendar-event me-2"></i>
+                            ${t.year}年 ${t.semester}
+                            <span class="badge bg-secondary ms-2">${t.record_count}条记录</span>
+                        </h6>
+                        <div>
+                            <button class="btn btn-sm btn-outline-primary" onclick="openRecordModal(${t.id})">
+                                <i class="bi bi-plus-lg"></i> 添加记录
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteTransition(${t.id})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        ${t.description ? `<p class="text-muted mb-3">${t.description}</p>` : ''}
+                        <div id="records-${t.id}">
+                            <div class="text-center py-2 text-muted">点击加载记录...</div>
+                        </div>
+                        <button class="btn btn-link p-0" onclick="loadTransitionRecords(${t.id})">
+                            <i class="bi bi-chevron-down me-1"></i> 展开/收起记录
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadTransitionRecords(id) {
+            try {
+                const data = await apiRequest(`/api/transitions/${id}`);
+                const container = document.getElementById(`records-${id}`);
+                
+                if (data.records.length === 0) {
+                    container.innerHTML = '<div class="text-center py-2 text-muted">暂无记录</div>';
+                    return;
+                }
+                
+                container.innerHTML = `
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>成员</th>
+                                    <th>原部门/职位</th>
+                                    <th>新部门/职位</th>
+                                    <th>备注</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${data.records.map(r => `
+                                    <tr>
+                                        <td><strong>${r.member_name}</strong></td>
+                                        <td>${r.old_department} / ${r.old_position}</td>
+                                        <td><span class="text-success">${r.new_department} / ${r.new_position}</span></td>
+                                        <td>${r.notes || '-'}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-danger table-action-btn" onclick="deleteRecord(${r.id})">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function openTransitionModal() {
+            const modal = new bootstrap.Modal(document.getElementById('transitionModal'));
+            document.getElementById('transition-year').value = new Date().getFullYear();
+            document.getElementById('transition-semester').value = '春季学期';
+            document.getElementById('transition-description').value = '';
+            modal.show();
+        }
+
+        async function saveTransition() {
+            const data = {
+                year: parseInt(document.getElementById('transition-year').value),
+                semester: document.getElementById('transition-semester').value,
+                description: document.getElementById('transition-description').value.trim()
+            };
+            
+            if (!data.year || !data.semester) {
+                showToast('错误', '年份和学期不能为空', 'danger');
+                return;
+            }
+            
+            try {
+                await apiRequest('/api/transitions', 'POST', data);
+                showToast('成功', '换届已创建');
+                bootstrap.Modal.getInstance(document.getElementById('transitionModal')).hide();
+                await loadTransitions();
+                await loadStats();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function deleteTransition(id) {
+            if (!confirm('确定要删除该换届及其所有记录吗？')) return;
+            
+            try {
+                await apiRequest(`/api/transitions/${id}`, 'DELETE');
+                showToast('成功', '换届已删除');
+                await loadTransitions();
+                await loadStats();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function openRecordModal(transitionId) {
+            await loadMembers();
+            const modal = new bootstrap.Modal(document.getElementById('recordModal'));
+            document.getElementById('record-transition-id').value = transitionId;
+            
+            const memberSelect = document.getElementById('record-member');
+            memberSelect.innerHTML = '<option value="">请选择成员</option>' + 
+                members.map(m => `<option value="${m.id}">${m.name} (${m.student_id})</option>`).join('');
+            
+            document.getElementById('record-new-position').value = '';
+            document.getElementById('record-new-department').value = '';
+            document.getElementById('record-notes').value = '';
+            modal.show();
+        }
+
+        async function saveRecord() {
+            const transitionId = document.getElementById('record-transition-id').value;
+            const memberId = document.getElementById('record-member').value;
+            const newDeptId = document.getElementById('record-new-department').value;
+            
+            if (!memberId) {
+                showToast('错误', '请选择成员', 'danger');
+                return;
+            }
+            
+            const data = {
+                member_id: parseInt(memberId),
+                new_position: document.getElementById('record-new-position').value.trim() || null,
+                new_department_id: newDeptId ? parseInt(newDeptId) : null,
+                notes: document.getElementById('record-notes').value.trim()
+            };
+            
+            try {
+                await apiRequest(`/api/transitions/${transitionId}/records`, 'POST', data);
+                showToast('成功', '换届记录已添加');
+                bootstrap.Modal.getInstance(document.getElementById('recordModal')).hide();
+                await loadTransitions();
+                await loadMembers();
+                await loadStats();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function deleteRecord(id) {
+            if (!confirm('确定要删除该记录吗？')) return;
+            
+            try {
+                await apiRequest(`/api/transitions/records/${id}`, 'DELETE');
+                showToast('成功', '记录已删除');
+                await loadTransitions();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+    </script>
+</body>
+</html>

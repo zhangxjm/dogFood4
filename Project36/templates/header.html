@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.title}} - 工地出勤管理系统</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>🏗️ 工地出勤管理系统</h1>
+            <nav class="nav">
+                <a href="/" class="{{if eq .active "home"}}active{{end}}">首页</a>
+                <a href="/workers" class="{{if eq .active "workers"}}active{{end}}">工人管理</a>
+                <a href="/attendance" class="{{if eq .active "attendance"}}active{{end}}">签到签退</a>
+                <a href="/attendance/records" class="{{if eq .active "records"}}active{{end}}">出勤记录</a>
+            </nav>
+        </div>
+    </header>
+    <main class="main">
+        <div class="container">

@@ -1,0 +1,33 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: foodorder-backend
+  
+  datasource:
+    url: jdbc:mysql://localhost:3306/foodorder?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: foodorder
+    password: foodorder123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    open-in-view: false
+
+logging:
+  level:
+    com.foodorder: info
+    org.hibernate.SQL: warn
+
+app:
+  qrcode:
+    base-url: http://localhost:5173/menu

@@ -1,0 +1,19 @@
+{
+  "name": "bookmark-cloud",
+  "version": "1.0.0",
+  "description": "个人云端网址收藏系统 - NestJS + Vue3 + MongoDB",
+  "scripts": {
+    "dev:server": "cd server && npm run start:dev",
+    "dev:client": "cd client && npm run dev",
+    "install:all": "cd server && npm install && cd ../client && npm install",
+    "build:server": "cd server && npm run build",
+    "build:client": "cd client && npm run build",
+    "start:server": "cd server && npm run start:prod",
+    "start:client": "cd client && npm run preview",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down"
+  },
+  "keywords": ["nestjs", "vue3", "mongodb", "bookmark"],
+  "author": "",
+  "license": "MIT"
+}

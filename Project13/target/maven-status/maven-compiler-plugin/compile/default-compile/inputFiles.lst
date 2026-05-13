@@ -1,0 +1,16 @@
+/Users/a2109164/Projects/dogFood4/Project13/src/main/java/com/supermarket/common/Result.java
+/Users/a2109164/Projects/dogFood4/Project13/src/main/java/com/supermarket/InventoryManagementApplication.java
+/Users/a2109164/Projects/dogFood4/Project13/src/main/java/com/supermarket/repository/ProductRepository.java
+/Users/a2109164/Projects/dogFood4/Project13/src/main/java/com/supermarket/service/impl/ProductServiceImpl.java
+/Users/a2109164/Projects/dogFood4/Project13/src/main/java/com/supermarket/controller/ProductController.java
+/Users/a2109164/Projects/dogFood4/Project13/src/main/java/com/supermarket/exception/GlobalExceptionHandler.java
+/Users/a2109164/Projects/dogFood4/Project13/src/main/java/com/supermarket/repository/CategoryRepository.java
+/Users/a2109164/Projects/dogFood4/Project13/src/main/java/com/supermarket/entity/Category.java
+/Users/a2109164/Projects/dogFood4/Project13/src/main/java/com/supermarket/service/CategoryService.java
+/Users/a2109164/Projects/dogFood4/Project13/src/main/java/com/supermarket/controller/CategoryController.java
+/Users/a2109164/Projects/dogFood4/Project13/src/main/java/com/supermarket/entity/Product.java
+/Users/a2109164/Projects/dogFood4/Project13/src/main/java/com/supermarket/dto/StockDTO.java
+/Users/a2109164/Projects/dogFood4/Project13/src/main/java/com/supermarket/dto/ProductDTO.java
+/Users/a2109164/Projects/dogFood4/Project13/src/main/java/com/supermarket/service/ProductService.java
+/Users/a2109164/Projects/dogFood4/Project13/src/main/java/com/supermarket/config/CorsConfig.java
+/Users/a2109164/Projects/dogFood4/Project13/src/main/java/com/supermarket/service/impl/CategoryServiceImpl.java

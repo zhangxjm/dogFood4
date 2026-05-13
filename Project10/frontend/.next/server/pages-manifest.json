@@ -1,0 +1,11 @@
+{
+  "/_app": "pages/_app.js",
+  "/_error": "pages/_error.js",
+  "/_document": "pages/_document.js",
+  "/processes": "pages/processes.js",
+  "/dashboard": "pages/dashboard.js",
+  "/login": "pages/login.js",
+  "/pending": "pages/pending.js",
+  "/messages": "pages/messages.js",
+  "/my-processes": "pages/my-processes.js"
+}

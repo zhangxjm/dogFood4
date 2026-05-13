@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: fruit-store-backend
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/app
+    environment:
+      - TZ=Asia/Shanghai
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: fruit-store-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    environment:
+      - TZ=Asia/Shanghai
+    restart: unless-stopped
+
+volumes:
+  data:

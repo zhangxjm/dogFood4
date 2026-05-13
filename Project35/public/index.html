@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>纪念日管理</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📅 纪念日管理</h1>
+      <button id="addBtn" class="btn btn-primary">+ 添加纪念日</button>
+    </header>
+
+    <div class="filter-section">
+      <label>筛选：</label>
+      <select id="typeFilter">
+        <option value="all">全部</option>
+        <option value="birthday">生日</option>
+        <option value="festival">节日</option>
+        <option value="other">其他</option>
+      </select>
+    </div>
+
+    <div id="anniversaryList" class="anniversary-list"></div>
+
+    <div id="emptyState" class="empty-state">
+      <p>暂无纪念日，点击上方按钮添加</p>
+    </div>
+  </div>
+
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">添加纪念日</h2>
+        <button id="closeModal" class="close-btn">&times;</button>
+      </div>
+      <form id="anniversaryForm">
+        <input type="hidden" id="editId">
+        <div class="form-group">
+          <label for="title">标题 <span class="required">*</span></label>
+          <input type="text" id="title" name="title" placeholder="例如：妈妈生日" required>
+        </div>
+        <div class="form-group">
+          <label for="type">类型 <span class="required">*</span></label>
+          <select id="type" name="type" required>
+            <option value="birthday">🎂 生日</option>
+            <option value="festival">🎉 节日</option>
+            <option value="other">📌 其他</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="date">日期 <span class="required">*</span></label>
+          <input type="date" id="date" name="date" required>
+        </div>
+        <div class="form-group">
+          <label for="note">备注</label>
+          <textarea id="note" name="note" rows="3" placeholder="添加备注信息..."></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="button" id="cancelBtn" class="btn btn-secondary">取消</button>
+          <button type="submit" class="btn btn-primary">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

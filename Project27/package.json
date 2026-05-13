@@ -1,0 +1,13 @@
+{
+  "name": "wishlist-app",
+  "version": "1.0.0",
+  "description": "个人心愿清单 - Express + Vue3 + MongoDB",
+  "scripts": {
+    "install:all": "npm install --prefix backend && npm install --prefix frontend",
+    "start:db": "docker compose up -d mongodb",
+    "start:backend": "npm start --prefix backend",
+    "start:frontend": "npm run dev --prefix frontend",
+    "dev": "npm run start:db && npm run start:backend",
+    "stop:db": "docker compose down"
+  }
+}

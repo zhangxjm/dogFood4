@@ -1,0 +1,15 @@
+{
+  "name": "photo-album-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "start:db": "docker compose up -d mongodb",
+    "stop:db": "docker compose down",
+    "start:backend": "cd backend && node server.js",
+    "dev:backend": "cd backend && node server.js",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build:frontend": "cd frontend && npm run build",
+    "dev": "npm run start:db && echo 'MongoDB is starting... Waiting 5 seconds...' && sleep 5 && npm run dev:backend & npm run dev:frontend"
+  }
+}

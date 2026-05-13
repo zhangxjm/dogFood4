@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>班级图书角借阅系统</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 班级图书角借阅系统</h1>
+            <nav>
+                <button class="nav-btn active" onclick="showTab('books')">图书管理</button>
+                <button class="nav-btn" onclick="showTab('students')">学生管理</button>
+                <button class="nav-btn" onclick="showTab('borrow')">借阅登记</button>
+                <button class="nav-btn" onclick="showTab('active')">在借图书</button>
+            </nav>
+        </header>
+
+        <main>
+            <section id="books-tab" class="tab-content active">
+                <div class="section-header">
+                    <h2>图书列表</h2>
+                    <button class="btn-primary" onclick="showAddBookModal()">+ 登记图书</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>图书编号</th>
+                            <th>书名</th>
+                            <th>作者</th>
+                            <th>出版社</th>
+                            <th>总数量</th>
+                            <th>可借数量</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="books-table">
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="students-tab" class="tab-content">
+                <div class="section-header">
+                    <h2>学生列表</h2>
+                    <button class="btn-primary" onclick="showAddStudentModal()">+ 添加学生</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>学号</th>
+                            <th>姓名</th>
+                            <th>班级</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="students-table">
+                    </tbody>
+                </table>
+            </section>
+
+            <section id="borrow-tab" class="tab-content">
+                <div class="section-header">
+                    <h2>借阅登记</h2>
+                </div>
+                <div class="borrow-section">
+                    <div class="form-card">
+                        <h3>借阅登记</h3>
+                        <form id="borrow-form" onsubmit="handleBorrow(event)">
+                            <div class="form-group">
+                                <label>学生</label>
+                                <select id="borrow-student" required>
+                                    <option value="">请选择学生</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>图书</label>
+                                <select id="borrow-book" required>
+                                    <option value="">请选择图书</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn-primary">登记借阅</button>
+                        </form>
+                    </div>
+
+                    <div class="form-card">
+                        <h3>归还登记</h3>
+                        <form id="return-form" onsubmit="handleReturn(event)">
+                            <div class="form-group">
+                                <label>选择在借记录</label>
+                                <select id="return-record" required>
+                                    <option value="">请选择要归还的图书</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn-success">登记归还</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <section id="active-tab" class="tab-content">
+                <div class="section-header">
+                    <h2>在借图书列表</h2>
+                    <button class="btn-primary" onclick="loadActiveBorrows()">🔄 刷新</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>学生学号</th>
+                            <th>学生姓名</th>
+                            <th>图书编号</th>
+                            <th>图书名称</th>
+                            <th>借阅日期</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="active-table">
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
