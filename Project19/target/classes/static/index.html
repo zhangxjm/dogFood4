@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>员工档案管理系统</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/element-ui@2.15.14/lib/theme-chalk/index.css">
+    <style>
+        body { margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif; }
+        .el-header { background-color: #409EFF; color: #fff; display: flex; align-items: center; padding: 0 20px; font-size: 18px; font-weight: bold; }
+        .el-container { min-height: 100vh; }
+        .el-aside { background-color: #545c64; padding-top: 10px; }
+        .el-menu { border-right: none; }
+        .content-box { padding: 20px; }
+        .search-box { margin-bottom: 20px; }
+        .table-box { background: #fff; padding: 20px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/element-ui@2.15.14/lib/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios@1.6.2/dist/axios.min.js"></script>
+
+<div id="app">
+    <el-container>
+        <el-header>员工档案管理系统</el-header>
+        <el-container>
+            <el-aside width="200px">
+                <el-menu
+                    background-color="#545c64"
+                    text-color="#fff"
+                    active-text-color="#ffd04b"
+                    :default-active="activeMenu"
+                    @select="handleMenuSelect">
+                    <el-menu-item index="employee">
+                        <i class="el-icon-user"></i>
+                        <span slot="title">员工管理</span>
+                    </el-menu-item>
+                    <el-menu-item index="department">
+                        <i class="el-icon-office-building"></i>
+                        <span slot="title">部门管理</span>
+                    </el-menu-item>
+                </el-menu>
+            </el-aside>
+            <el-main>
+                <div class="content-box" v-if="activeMenu === 'employee'">
+                    <div class="search-box">
+                        <el-form :inline="true" :model="searchForm">
+                            <el-form-item label="员工姓名">
+                                <el-input v-model="searchForm.name" placeholder="请输入姓名" clearable></el-input>
+                            </el-form-item>
+                            <el-form-item label="所属部门">
+                                <el-select v-model="searchForm.departmentId" placeholder="请选择部门" clearable>
+                                    <el-option
+                                        v-for="dept in departments"
+                                        :key="dept.id"
+                                        :label="dept.name"
+                                        :value="dept.id">
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" @click="searchEmployee">查询</el-button>
+                                <el-button @click="resetSearchEmployee">重置</el-button>
+                                <el-button type="success" @click="addEmployee">新增员工</el-button>
+                            </el-form-item>
+                        </el-form>
+                    </div>
+
+                    <div class="table-box">
+                        <el-table :data="employeeList" border stripe>
+                            <el-table-column type="index" label="序号" width="60"></el-table-column>
+                            <el-table-column prop="name" label="姓名" width="100"></el-table-column>
+                            <el-table-column prop="gender" label="性别" width="80"></el-table-column>
+                            <el-table-column prop="birthDate" label="出生日期" width="120"></el-table-column>
+                            <el-table-column prop="phone" label="电话" width="130"></el-table-column>
+                            <el-table-column prop="email" label="邮箱" width="180"></el-table-column>
+                            <el-table-column prop="position" label="职位" width="100"></el-table-column>
+                            <el-table-column label="部门" width="120">
+                                <template slot-scope="scope">
+                                    {{ scope.row.department ? scope.row.department.name : '-' }}
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="address" label="地址" width="200" show-overflow-tooltip></el-table-column>
+                            <el-table-column label="操作" width="180">
+                                <template slot-scope="scope">
+                                    <el-button size="mini" type="primary" @click="editEmployee(scope.row)">编辑</el-button>
+                                    <el-button size="mini" type="danger" @click="deleteEmployee(scope.row)">删除</el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </div>
+                </div>
+
+                <div class="content-box" v-if="activeMenu === 'department'">
+                    <div class="search-box">
+                        <el-button type="success" @click="addDepartment">新增部门</el-button>
+                    </div>
+
+                    <div class="table-box">
+                        <el-table :data="departments" border stripe>
+                            <el-table-column type="index" label="序号" width="60"></el-table-column>
+                            <el-table-column prop="name" label="部门名称" width="200"></el-table-column>
+                            <el-table-column prop="description" label="部门描述"></el-table-column>
+                            <el-table-column label="操作" width="180">
+                                <template slot-scope="scope">
+                                    <el-button size="mini" type="primary" @click="editDepartment(scope.row)">编辑</el-button>
+                                    <el-button size="mini" type="danger" @click="deleteDepartment(scope.row)">删除</el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </div>
+                </div>
+            </el-main>
+        </el-container>
+    </el-container>
+
+    <el-dialog :title="employeeDialogTitle" :visible.sync="employeeDialogVisible" width="600px">
+        <el-form :model="employeeForm" :rules="employeeRules" ref="employeeFormRef" label-width="80px">
+            <el-form-item label="姓名" prop="name">
+                <el-input v-model="employeeForm.name"></el-input>
+            </el-form-item>
+            <el-form-item label="性别" prop="gender">
+                <el-radio-group v-model="employeeForm.gender">
+                    <el-radio label="男">男</el-radio>
+                    <el-radio label="女">女</el-radio>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item label="生日" prop="birthDate">
+                <el-date-picker
+                    v-model="employeeForm.birthDate"
+                    type="date"
+                    placeholder="选择日期"
+                    value-format="yyyy-MM-dd">
+                </el-date-picker>
+            </el-form-item>
+            <el-form-item label="电话" prop="phone">
+                <el-input v-model="employeeForm.phone"></el-input>
+            </el-form-item>
+            <el-form-item label="邮箱" prop="email">
+                <el-input v-model="employeeForm.email"></el-input>
+            </el-form-item>
+            <el-form-item label="职位" prop="position">
+                <el-input v-model="employeeForm.position"></el-input>
+            </el-form-item>
+            <el-form-item label="部门" prop="departmentId">
+                <el-select v-model="employeeForm.departmentId" placeholder="请选择部门" clearable>
+                    <el-option
+                        v-for="dept in departments"
+                        :key="dept.id"
+                        :label="dept.name"
+                        :value="dept.id">
+                    </el-option>
+                </el-select>
+            </el-form-item>
+            <el-form-item label="地址" prop="address">
+                <el-input v-model="employeeForm.address"></el-input>
+            </el-form-item>
+            <el-form-item label="备注" prop="remark">
+                <el-input type="textarea" v-model="employeeForm.remark" :rows="3"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="employeeDialogVisible = false">取 消</el-button>
+            <el-button type="primary" @click="submitEmployee">确 定</el-button>
+        </div>
+    </el-dialog>
+
+    <el-dialog :title="departmentDialogTitle" :visible.sync="departmentDialogVisible" width="500px">
+        <el-form :model="departmentForm" :rules="departmentRules" ref="departmentFormRef" label-width="80px">
+            <el-form-item label="部门名称" prop="name">
+                <el-input v-model="departmentForm.name"></el-input>
+            </el-form-item>
+            <el-form-item label="部门描述" prop="description">
+                <el-input type="textarea" v-model="departmentForm.description" :rows="3"></el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="departmentDialogVisible = false">取 消</el-button>
+            <el-button type="primary" @click="submitDepartment">确 定</el-button>
+        </div>
+    </el-dialog>
+</div>
+
+<script>
+    axios.defaults.baseURL = 'http://localhost:8081';
+
+    new Vue({
+        el: '#app',
+        data: {
+            activeMenu: 'employee',
+            searchForm: {
+                name: '',
+                departmentId: null
+            },
+            employeeList: [],
+            departments: [],
+            employeeDialogVisible: false,
+            employeeDialogTitle: '',
+            employeeForm: {
+                id: null,
+                name: '',
+                gender: '男',
+                birthDate: '',
+                phone: '',
+                email: '',
+                position: '',
+                departmentId: null,
+                address: '',
+                remark: ''
+            },
+            employeeRules: {
+                name: [
+                    { required: true, message: '请输入员工姓名', trigger: 'blur' }
+                ]
+            },
+            departmentDialogVisible: false,
+            departmentDialogTitle: '',
+            departmentForm: {
+                id: null,
+                name: '',
+                description: ''
+            },
+            departmentRules: {
+                name: [
+                    { required: true, message: '请输入部门名称', trigger: 'blur' }
+                ]
+            }
+        },
+        created() {
+            this.loadDepartments();
+            this.loadEmployees();
+        },
+        methods: {
+            handleMenuSelect(index) {
+                this.activeMenu = index;
+                if (index === 'department') {
+                    this.loadDepartments();
+                }
+            },
+
+            loadDepartments() {
+                axios.get('/api/departments')
+                    .then(response => {
+                        this.departments = response.data;
+                    })
+                    .catch(error => {
+                        this.$message.error('加载部门数据失败');
+                        console.error(error);
+                    });
+            },
+
+            loadEmployees() {
+                const params = {};
+                if (this.searchForm.name) {
+                    params.name = this.searchForm.name;
+                }
+                if (this.searchForm.departmentId) {
+                    params.departmentId = this.searchForm.departmentId;
+                }
+
+                axios.get('/api/employees', { params })
+                    .then(response => {
+                        this.employeeList = response.data;
+                    })
+                    .catch(error => {
+                        this.$message.error('加载员工数据失败');
+                        console.error(error);
+                    });
+            },
+
+            searchEmployee() {
+                this.loadEmployees();
+            },
+
+            resetSearchEmployee() {
+                this.searchForm.name = '';
+                this.searchForm.departmentId = null;
+                this.loadEmployees();
+            },
+
+            addEmployee() {
+                this.employeeDialogTitle = '新增员工';
+                this.employeeForm = {
+                    id: null,
+                    name: '',
+                    gender: '男',
+                    birthDate: '',
+                    phone: '',
+                    email: '',
+                    position: '',
+                    departmentId: null,
+                    address: '',
+                    remark: ''
+                };
+                this.employeeDialogVisible = true;
+            },
+
+            editEmployee(row) {
+                this.employeeDialogTitle = '编辑员工';
+                this.employeeForm = {
+                    id: row.id,
+                    name: row.name,
+                    gender: row.gender,
+                    birthDate: row.birthDate,
+                    phone: row.phone,
+                    email: row.email,
+                    position: row.position,
+                    departmentId: row.department ? row.department.id : null,
+                    address: row.address,
+                    remark: row.remark
+                };
+                this.employeeDialogVisible = true;
+            },
+
+            submitEmployee() {
+                this.$refs.employeeFormRef.validate((valid) => {
+                    if (valid) {
+                        const data = {
+                            name: this.employeeForm.name,
+                            gender: this.employeeForm.gender,
+                            birthDate: this.employeeForm.birthDate,
+                            phone: this.employeeForm.phone,
+                            email: this.employeeForm.email,
+                            position: this.employeeForm.position,
+                            address: this.employeeForm.address,
+                            remark: this.employeeForm.remark,
+                            department: this.employeeForm.departmentId ? { id: this.employeeForm.departmentId } : null
+                        };
+
+                        let request;
+                        if (this.employeeForm.id) {
+                            request = axios.put(`/api/employees/${this.employeeForm.id}`, data);
+                        } else {
+                            request = axios.post('/api/employees', data);
+                        }
+
+                        request.then(() => {
+                            this.$message.success('保存成功');
+                            this.employeeDialogVisible = false;
+                            this.loadEmployees();
+                        }).catch(error => {
+                            this.$message.error('保存失败');
+                            console.error(error);
+                        });
+                    }
+                });
+            },
+
+            deleteEmployee(row) {
+                this.$confirm('确定要删除该员工吗?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios.delete(`/api/employees/${row.id}`)
+                        .then(() => {
+                            this.$message.success('删除成功');
+                            this.loadEmployees();
+                        })
+                        .catch(error => {
+                            this.$message.error('删除失败');
+                            console.error(error);
+                        });
+                }).catch(() => {});
+            },
+
+            addDepartment() {
+                this.departmentDialogTitle = '新增部门';
+                this.departmentForm = {
+                    id: null,
+                    name: '',
+                    description: ''
+                };
+                this.departmentDialogVisible = true;
+            },
+
+            editDepartment(row) {
+                this.departmentDialogTitle = '编辑部门';
+                this.departmentForm = {
+                    id: row.id,
+                    name: row.name,
+                    description: row.description
+                };
+                this.departmentDialogVisible = true;
+            },
+
+            submitDepartment() {
+                this.$refs.departmentFormRef.validate((valid) => {
+                    if (valid) {
+                        const data = {
+                            name: this.departmentForm.name,
+                            description: this.departmentForm.description
+                        };
+
+                        let request;
+                        if (this.departmentForm.id) {
+                            request = axios.put(`/api/departments/${this.departmentForm.id}`, data);
+                        } else {
+                            request = axios.post('/api/departments', data);
+                        }
+
+                        request.then(() => {
+                            this.$message.success('保存成功');
+                            this.departmentDialogVisible = false;
+                            this.loadDepartments();
+                            this.loadEmployees();
+                        }).catch(error => {
+                            this.$message.error('保存失败');
+                            console.error(error);
+                        });
+                    }
+                });
+            },
+
+            deleteDepartment(row) {
+                this.$confirm('确定要删除该部门吗?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios.delete(`/api/departments/${row.id}`)
+                        .then(() => {
+                            this.$message.success('删除成功');
+                            this.loadDepartments();
+                            this.loadEmployees();
+                        })
+                        .catch(error => {
+                            this.$message.error('删除失败，请先删除该部门下的所有员工');
+                            console.error(error);
+                        });
+                }).catch(() => {});
+            }
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  crm-backend:
+    build: ./crm-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    volumes:
+      - ./crm-backend/data:/app/data
+
+  crm-frontend:
+    build: ./crm-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - crm-backend

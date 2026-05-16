@@ -1,0 +1,58 @@
+server:
+  port: 9999
+
+spring:
+  application:
+    name: erp-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowed-origin-patterns: "*"
+            allowed-methods: "*"
+            allowed-headers: "*"
+            allow-credentials: true
+            max-age: 3600
+      routes:
+        - id: erp-product
+          uri: lb://erp-product
+          predicates:
+            - Path=/api/product/**,/api/category/**
+        - id: erp-purchase
+          uri: lb://erp-purchase
+          predicates:
+            - Path=/api/purchase/**,/api/supplier/**
+        - id: erp-sales
+          uri: lb://erp-sales
+          predicates:
+            - Path=/api/sales/**,/api/customer/**
+        - id: erp-inventory
+          uri: lb://erp-inventory
+          predicates:
+            - Path=/api/inventory/**,/api/warehouse/**,/api/inventory-alert/**
+        - id: erp-finance
+          uri: lb://erp-finance
+          predicates:
+            - Path=/api/finance/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always

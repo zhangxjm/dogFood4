@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>快递驿站包裹管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background-color: #f5f7fa;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+            color: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .nav {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .nav button {
+            padding: 10px 20px;
+            border: none;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .nav button:hover,
+        .nav button.active {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        
+        .card h2 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #1e88e5;
+        }
+        
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #1e88e5;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #1976d2;
+        }
+        
+        .btn-success {
+            background: #43a047;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #388e3c;
+        }
+        
+        .btn-warning {
+            background: #fb8c00;
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: #f57c00;
+        }
+        
+        .btn-danger {
+            background: #e53935;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #d32f2f;
+        }
+        
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        
+        .search-form {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .search-form .form-group {
+            min-width: 180px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background: #fafafa;
+            color: #666;
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background: #f9f9f9;
+        }
+        
+        .status {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-registered {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+        
+        .status-in-storage {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        
+        .status-picked-up {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .stats-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        
+        .stat-card .number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1e88e5;
+        }
+        
+        .stat-card .label {
+            font-size: 14px;
+            color: #666;
+            margin-top: 8px;
+        }
+        
+        .stat-card.in-storage .number {
+            color: #fb8c00;
+        }
+        
+        .stat-card.picked-up .number {
+            color: #43a047;
+        }
+        
+        .message {
+            padding: 12px 16px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        .message.show {
+            display: block;
+        }
+        
+        .message.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .message.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            width: 400px;
+            max-width: 90%;
+        }
+        
+        .modal-content h3 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .modal-footer {
+            margin-top: 20px;
+            text-align: right;
+        }
+        
+        .modal-footer .btn {
+            margin-left: 10px;
+        }
+        
+        .empty {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>快递驿站包裹管理系统</h1>
+        <div class="nav">
+            <button class="active" onclick="showPage('home')">首页概览</button>
+            <button onclick="showPage('register')">包裹登记</button>
+            <button onclick="showPage('in-storage')">入库管理</button>
+            <button onclick="showPage('pick-up')">取件出库</button>
+            <button onclick="showPage('query')">包裹查询</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div id="page-home" class="page active">
+            <div class="card">
+                <h2>数据概览</h2>
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="number" id="stat-total">0</div>
+                        <div class="label">累计包裹</div>
+                    </div>
+                    <div class="stat-card in-storage">
+                        <div class="number" id="stat-in-storage">0</div>
+                        <div class="label">在库包裹</div>
+                    </div>
+                    <div class="stat-card picked-up">
+                        <div class="number" id="stat-picked-up">0</div>
+                        <div class="label">已取件</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>最近录入</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>快递单号</th>
+                            <th>收件人</th>
+                            <th>状态</th>
+                            <th>录入时间</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-list"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="page-register" class="page">
+            <div class="card">
+                <h2>包裹登记</h2>
+                <div id="msg-register" class="message"></div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>快递单号 *</label>
+                        <input type="text" id="reg-tracking" placeholder="请输入快递单号">
+                    </div>
+                    <div class="form-group">
+                        <label>收件人 *</label>
+                        <input type="text" id="reg-recipient" placeholder="请输入收件人姓名">
+                    </div>
+                    <div class="form-group">
+                        <label>联系电话</label>
+                        <input type="text" id="reg-phone" placeholder="请输入联系电话">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>快递公司</label>
+                        <input type="text" id="reg-company" placeholder="请输入快递公司">
+                    </div>
+                    <div class="form-group">
+                        <label>备注</label>
+                        <input type="text" id="reg-remark" placeholder="请输入备注">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="registerPackage()">登记包裹</button>
+            </div>
+        </div>
+        
+        <div id="page-in-storage" class="page">
+            <div class="card">
+                <h2>入库管理</h2>
+                <div id="msg-in-storage" class="message"></div>
+                <div class="search-form">
+                    <div class="form-group">
+                        <label>快递单号</label>
+                        <input type="text" id="in-tracking" placeholder="请输入快递单号">
+                    </div>
+                    <div class="form-group">
+                        <label>存放位置</label>
+                        <input type="text" id="in-location" placeholder="如：A架3层">
+                    </div>
+                    <div class="form-group">
+                        <label>操作员</label>
+                        <input type="text" id="in-operator" placeholder="请输入操作员">
+                    </div>
+                    <button class="btn btn-success" onclick="inStorage()">入库登记</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>快递单号</th>
+                            <th>收件人</th>
+                            <th>当前状态</th>
+                            <th>录入时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="in-storage-list"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="page-pick-up" class="page">
+            <div class="card">
+                <h2>取件出库</h2>
+                <div id="msg-pick-up" class="message"></div>
+                <div class="search-form">
+                    <div class="form-group">
+                        <label>快递单号</label>
+                        <input type="text" id="pick-tracking" placeholder="请输入快递单号">
+                    </div>
+                    <div class="form-group">
+                        <label>操作员</label>
+                        <input type="text" id="pick-operator" placeholder="请输入操作员">
+                    </div>
+                    <button class="btn btn-warning" onclick="pickUp()">确认取件</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>快递单号</th>
+                            <th>收件人</th>
+                            <th>联系电话</th>
+                            <th>存放位置</th>
+                            <th>入库时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pick-up-list"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="page-query" class="page">
+            <div class="card">
+                <h2>包裹查询</h2>
+                <div class="search-form">
+                    <div class="form-group">
+                        <label>搜索关键词</label>
+                        <input type="text" id="q-keyword" placeholder="快递单号、收件人、电话">
+                    </div>
+                    <div class="form-group">
+                        <label>状态</label>
+                        <select id="q-status">
+                            <option value="">全部状态</option>
+                            <option value="REGISTERED">已登记</option>
+                            <option value="IN_STORAGE">已入库</option>
+                            <option value="PICKED_UP">已取件</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="searchPackages()">查询</button>
+                    <button class="btn" onclick="refreshQuery()">刷新</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>快递单号</th>
+                            <th>收件人</th>
+                            <th>联系电话</th>
+                            <th>快递公司</th>
+                            <th>存放位置</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="query-list"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h3 id="modal-title">包裹详情</h3>
+            <div id="modal-body"></div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = '/api/packages';
+        
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+            document.getElementById('page-' + page).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (page === 'home') loadHome();
+            if (page === 'in-storage') loadInStorageList();
+            if (page === 'pick-up') loadPickUpList();
+            if (page === 'query') searchPackages();
+        }
+        
+        async function apiRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    headers: { 'Content-Type': 'application/json' },
+                    ...options
+                });
+                if (!response.ok) {
+                    const text = await response.text();
+                    throw new Error(text || '请求失败');
+                }
+                const text = await response.text();
+                if (!text) {
+                    return null;
+                }
+                try {
+                    return JSON.parse(text);
+                } catch {
+                    return text;
+                }
+            } catch (e) {
+                throw e;
+            }
+        }
+        
+        function showMessage(id, text, type = 'success') {
+            const el = document.getElementById(id);
+            el.textContent = text;
+            el.className = 'message show ' + type;
+            setTimeout(() => {
+                el.classList.remove('show');
+            }, 3000);
+        }
+        
+        function getStatusClass(status) {
+            switch (status) {
+                case 'REGISTERED': return 'status status-registered';
+                case 'IN_STORAGE': return 'status status-in-storage';
+                case 'PICKED_UP': return 'status status-picked-up';
+                default: return 'status';
+            }
+        }
+        
+        function getStatusText(status) {
+            switch (status) {
+                case 'REGISTERED': return '已登记';
+                case 'IN_STORAGE': return '已入库';
+                case 'PICKED_UP': return '已取件';
+                default: return status;
+            }
+        }
+        
+        async function loadHome() {
+            const packages = await apiRequest(API_BASE);
+            const inStorage = packages.filter(p => p.status === 'IN_STORAGE');
+            const pickedUp = packages.filter(p => p.status === 'PICKED_UP');
+            
+            document.getElementById('stat-total').textContent = packages.length;
+            document.getElementById('stat-in-storage').textContent = inStorage.length;
+            document.getElementById('stat-picked-up').textContent = pickedUp.length;
+            
+            const recent = packages.slice(0, 10);
+            const tbody = document.getElementById('recent-list');
+            tbody.innerHTML = recent.length ? recent.map(p => `
+                <tr>
+                    <td>${p.trackingNumber}</td>
+                    <td>${p.recipient}</td>
+                    <td><span class="${getStatusClass(p.status)}">${getStatusText(p.status)}</span></td>
+                    <td>${p.createTime?.replace('T', ' ').substring(0, 19) || ''}</td>
+                </tr>
+            `).join('') : '<tr><td colspan="4" class="empty">暂无数据</td></tr>';
+        }
+        
+        async function registerPackage() {
+            const trackingNumber = document.getElementById('reg-tracking').value.trim();
+            const recipient = document.getElementById('reg-recipient').value.trim();
+            const phone = document.getElementById('reg-phone').value.trim();
+            const expressCompany = document.getElementById('reg-company').value.trim();
+            const remark = document.getElementById('reg-remark').value.trim();
+            
+            if (!trackingNumber || !recipient) {
+                showMessage('msg-register', '请填写必填项：快递单号、收件人', 'error');
+                return;
+            }
+            
+            try {
+                await apiRequest(API_BASE, {
+                    method: 'POST',
+                    body: JSON.stringify({ trackingNumber, recipient, phone, expressCompany, remark })
+                });
+                showMessage('msg-register', '登记成功！', 'success');
+                ['reg-tracking', 'reg-recipient', 'reg-phone', 'reg-company', 'reg-remark'].forEach(id => {
+                    document.getElementById(id).value = '';
+                });
+            } catch (e) {
+                try {
+                    const err = JSON.parse(e.message);
+                    showMessage('msg-register', err.error || '登记失败', 'error');
+                } catch {
+                    showMessage('msg-register', e.message || '登记失败', 'error');
+                }
+            }
+        }
+        
+        async function loadInStorageList() {
+            const packages = await apiRequest(API_BASE + '/search?status=REGISTERED');
+            const tbody = document.getElementById('in-storage-list');
+            tbody.innerHTML = packages.length ? packages.map(p => `
+                <tr>
+                    <td>${p.trackingNumber}</td>
+                    <td>${p.recipient}</td>
+                    <td><span class="${getStatusClass(p.status)}">${getStatusText(p.status)}</span></td>
+                    <td>${p.createTime?.replace('T', ' ').substring(0, 19) || ''}</td>
+                    <td>
+                        <button class="btn btn-success btn-small" onclick="quickInStorage('${p.trackingNumber}')">入库</button>
+                    </td>
+                </tr>
+            `).join('') : '<tr><td colspan="5" class="empty">暂无待入库包裹</td></tr>';
+        }
+        
+        async function inStorage() {
+            const trackingNumber = document.getElementById('in-tracking').value.trim();
+            const location = document.getElementById('in-location').value.trim();
+            const operator = document.getElementById('in-operator').value.trim();
+            
+            if (!trackingNumber) {
+                showMessage('msg-in-storage', '请输入快递单号', 'error');
+                return;
+            }
+            
+            try {
+                await apiRequest(`${API_BASE}/tracking/${encodeURIComponent(trackingNumber)}/in-storage?location=${encodeURIComponent(location)}&operator=${encodeURIComponent(operator)}`, {
+                    method: 'POST'
+                });
+                showMessage('msg-in-storage', '入库成功！', 'success');
+                document.getElementById('in-tracking').value = '';
+                document.getElementById('in-location').value = '';
+                loadInStorageList();
+            } catch (e) {
+                try {
+                    const err = JSON.parse(e.message);
+                    showMessage('msg-in-storage', err.error || '入库失败', 'error');
+                } catch {
+                    showMessage('msg-in-storage', e.message || '入库失败', 'error');
+                }
+            }
+        }
+        
+        async function quickInStorage(trackingNumber) {
+            const operator = document.getElementById('in-operator').value.trim();
+            try {
+                await apiRequest(`${API_BASE}/tracking/${encodeURIComponent(trackingNumber)}/in-storage?operator=${encodeURIComponent(operator)}`, {
+                    method: 'POST'
+                });
+                showMessage('msg-in-storage', '入库成功！', 'success');
+                loadInStorageList();
+            } catch (e) {
+                try {
+                    const err = JSON.parse(e.message);
+                    showMessage('msg-in-storage', err.error || '入库失败', 'error');
+                } catch {
+                    showMessage('msg-in-storage', e.message || '入库失败', 'error');
+                }
+            }
+        }
+        
+        async function loadPickUpList() {
+            const packages = await apiRequest(API_BASE + '/search?status=IN_STORAGE');
+            const tbody = document.getElementById('pick-up-list');
+            tbody.innerHTML = packages.length ? packages.map(p => `
+                <tr>
+                    <td>${p.trackingNumber}</td>
+                    <td>${p.recipient}</td>
+                    <td>${p.phone || '-'}</td>
+                    <td>${p.location || '-'}</td>
+                    <td>${p.inTime?.replace('T', ' ').substring(0, 19) || '-'}</td>
+                    <td>
+                        <button class="btn btn-warning btn-small" onclick="quickPickUp('${p.trackingNumber}')">取件</button>
+                    </td>
+                </tr>
+            `).join('') : '<tr><td colspan="6" class="empty">暂无在库包裹</td></tr>';
+        }
+        
+        async function pickUp() {
+            const trackingNumber = document.getElementById('pick-tracking').value.trim();
+            const operator = document.getElementById('pick-operator').value.trim();
+            
+            if (!trackingNumber) {
+                showMessage('msg-pick-up', '请输入快递单号', 'error');
+                return;
+            }
+            
+            try {
+                await apiRequest(`${API_BASE}/tracking/${encodeURIComponent(trackingNumber)}/pick-up?outOperator=${encodeURIComponent(operator)}`, {
+                    method: 'POST'
+                });
+                showMessage('msg-pick-up', '取件成功！', 'success');
+                document.getElementById('pick-tracking').value = '';
+                loadPickUpList();
+            } catch (e) {
+                try {
+                    const err = JSON.parse(e.message);
+                    showMessage('msg-pick-up', err.error || '取件失败', 'error');
+                } catch {
+                    showMessage('msg-pick-up', e.message || '取件失败', 'error');
+                }
+            }
+        }
+        
+        async function quickPickUp(trackingNumber) {
+            const operator = document.getElementById('pick-operator').value.trim();
+            try {
+                await apiRequest(`${API_BASE}/tracking/${encodeURIComponent(trackingNumber)}/pick-up?outOperator=${encodeURIComponent(operator)}`, {
+                    method: 'POST'
+                });
+                showMessage('msg-pick-up', '取件成功！', 'success');
+                loadPickUpList();
+            } catch (e) {
+                try {
+                    const err = JSON.parse(e.message);
+                    showMessage('msg-pick-up', err.error || '取件失败', 'error');
+                } catch {
+                    showMessage('msg-pick-up', e.message || '取件失败', 'error');
+                }
+            }
+        }
+        
+        async function searchPackages() {
+            const keyword = document.getElementById('q-keyword').value.trim();
+            const status = document.getElementById('q-status').value;
+            let url = API_BASE + '/search';
+            if (keyword) url += `?keyword=${encodeURIComponent(keyword)}`;
+            if (status) url += (keyword ? '&' : '?') + `status=${status}`;
+            
+            const packages = await apiRequest(url);
+            const tbody = document.getElementById('query-list');
+            tbody.innerHTML = packages.length ? packages.map(p => `
+                <tr>
+                    <td>${p.trackingNumber}</td>
+                    <td>${p.recipient}</td>
+                    <td>${p.phone || '-'}</td>
+                    <td>${p.expressCompany || '-'}</td>
+                    <td>${p.location || '-'}</td>
+                    <td><span class="${getStatusClass(p.status)}">${getStatusText(p.status)}</span></td>
+                    <td>
+                        <button class="btn btn-small" onclick="viewDetail(${p.id})">详情</button>
+                        <button class="btn btn-danger btn-small" onclick="deletePackage(${p.id})">删除</button>
+                    </td>
+                </tr>
+            `).join('') : '<tr><td colspan="7" class="empty">未找到相关包裹</td></tr>';
+        }
+        
+        function refreshQuery() {
+            document.getElementById('q-keyword').value = '';
+            document.getElementById('q-status').value = '';
+            searchPackages();
+        }
+        
+        async function viewDetail(id) {
+            const pkg = await apiRequest(API_BASE + '/' + id);
+            document.getElementById('modal-title').textContent = '包裹详情';
+            document.getElementById('modal-body').innerHTML = `
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>快递单号</label>
+                        <input type="text" value="${pkg.trackingNumber}" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>收件人</label>
+                        <input type="text" value="${pkg.recipient}" disabled>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>联系电话</label>
+                        <input type="text" value="${pkg.phone || ''}" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>快递公司</label>
+                        <input type="text" value="${pkg.expressCompany || ''}" disabled>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>存放位置</label>
+                        <input type="text" value="${pkg.location || ''}" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>状态</label>
+                        <input type="text" value="${getStatusText(pkg.status)}" disabled>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>登记时间</label>
+                        <input type="text" value="${pkg.createTime?.replace('T', ' ').substring(0, 19) || ''}" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>入库时间</label>
+                        <input type="text" value="${pkg.inTime?.replace('T', ' ').substring(0, 19) || '-'}" disabled>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>取件时间</label>
+                        <input type="text" value="${pkg.outTime?.replace('T', ' ').substring(0, 19) || '-'}" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label>备注</label>
+                        <input type="text" value="${pkg.remark || ''}" disabled>
+                    </div>
+                </div>
+            `;
+            document.getElementById('modal').classList.add('show');
+        }
+        
+        function closeModal() {
+            document.getElementById('modal').classList.remove('show');
+        }
+        
+        async function deletePackage(id) {
+            if (!confirm('确定要删除这个包裹记录吗？')) return;
+            await apiRequest(API_BASE + '/' + id, { method: 'DELETE' });
+            searchPackages();
+        }
+        
+        window.onload = loadHome;
+    </script>
+</body>
+</html>
