@@ -1,6 +1,5 @@
 package com.example.leavesystem.dto;
 
-import com.example.leavesystem.enums.LeaveType;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -10,7 +9,7 @@ import java.time.LocalDate;
 @Data
 public class LeaveApplicationDTO {
     @NotNull(message = "请假类型不能为空")
-    private LeaveType leaveType;
+    private Long leaveTypeId;
 
     @NotNull(message = "开始日期不能为空")
     private LocalDate startDate;

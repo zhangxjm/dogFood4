@@ -38,6 +38,12 @@ const routes = [
     meta: { requiresAuth: true, roles: ['TEACHER_FIRST', 'TEACHER_SECOND'] }
   },
   {
+    path: '/leave-type-config',
+    name: 'LeaveTypeConfig',
+    component: () => import('../views/LeaveTypeConfig.vue'),
+    meta: { requiresAuth: true, roles: ['TEACHER_FIRST', 'TEACHER_SECOND'] }
+  },
+  {
     path: '/detail/:id',
     name: 'Detail',
     component: () => import('../views/Detail.vue'),

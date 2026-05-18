@@ -4,10 +4,14 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
   try {
-    const { skill } = req.query;
-    let query = {};
+    const { skill, verifiedOnly } = req.query;
+    let query = { isActive: true };
     if (skill) {
-      query = { skills: skill, isActive: true };
+      query.skills = skill;
+    }
+    if (verifiedOnly === 'true') {
+      query.verificationStatus = '审核通过';
+      query.canReceiveOrders = true;
     }
     const workers = await Worker.find(query).sort({ rating: -1 });
     res.json(workers);

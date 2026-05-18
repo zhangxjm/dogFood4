@@ -44,7 +44,7 @@ public class ExcelExportService {
                 createCell(row, colNum++, rowNum - 1, dataStyle);
                 createCell(row, colNum++, leave.getStudent().getName(), dataStyle);
                 createCell(row, colNum++, leave.getStudent().getClassName(), dataStyle);
-                createCell(row, colNum++, leave.getLeaveType().getDescription(), dataStyle);
+                createCell(row, colNum++, leave.getLeaveType().getTypeName(), dataStyle);
                 createCell(row, colNum++, leave.getStartDate() != null ? 
                     leave.getStartDate().format(DATE_FORMATTER) : "", dataStyle);
                 createCell(row, colNum++, leave.getEndDate() != null ? 

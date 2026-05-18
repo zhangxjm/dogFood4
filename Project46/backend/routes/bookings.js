@@ -173,6 +173,14 @@ router.post('/', async (req, res) => {
       return res.status(404).json({ message: '服务或服务人员不存在' });
     }
     
+    if (!worker.canReceiveOrders || worker.verificationStatus !== '审核通过') {
+      return res.status(400).json({ 
+        message: '该服务人员资质未审核通过，暂不能预约',
+        code: 'VERIFICATION_REQUIRED',
+        verificationStatus: worker.verificationStatus
+      });
+    }
+    
     if (!isWorkerAvailable(worker, date, startTime, endTime)) {
       return res.status(400).json({ 
         message: '该服务人员在该时间段不工作',

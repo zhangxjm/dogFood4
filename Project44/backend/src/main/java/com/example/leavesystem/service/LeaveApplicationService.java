@@ -2,10 +2,12 @@ package com.example.leavesystem.service;
 
 import com.example.leavesystem.dto.LeaveApplicationDTO;
 import com.example.leavesystem.entity.LeaveApplication;
+import com.example.leavesystem.entity.LeaveTypeConfig;
 import com.example.leavesystem.entity.User;
 import com.example.leavesystem.enums.LeaveStatus;
 import com.example.leavesystem.enums.UserRole;
 import com.example.leavesystem.repository.LeaveApplicationRepository;
+import com.example.leavesystem.repository.LeaveTypeConfigRepository;
 import com.example.leavesystem.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,9 @@ public class LeaveApplicationService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private LeaveTypeConfigRepository leaveTypeConfigRepository;
+
     @Transactional
     public LeaveApplication createLeave(Long studentId, LeaveApplicationDTO dto) {
         if (dto.getStartDate().isAfter(dto.getEndDate())) {
@@ -36,9 +41,16 @@ public class LeaveApplicationService {
             throw new RuntimeException("只有学生可以申请请假");
         }
 
+        LeaveTypeConfig leaveType = leaveTypeConfigRepository.findById(dto.getLeaveTypeId())
+                .orElseThrow(() -> new RuntimeException("请假类型不存在"));
+
+        if (!leaveType.getEnabled()) {
+            throw new RuntimeException("该请假类型已禁用");
+        }
+
         LeaveApplication leave = new LeaveApplication();
         leave.setStudent(student);
-        leave.setLeaveType(dto.getLeaveType());
+        leave.setLeaveType(leaveType);
         leave.setStartDate(dto.getStartDate());
         leave.setEndDate(dto.getEndDate());
         leave.setReason(dto.getReason());

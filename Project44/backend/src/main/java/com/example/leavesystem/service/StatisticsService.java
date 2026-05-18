@@ -1,6 +1,7 @@
 package com.example.leavesystem.service;
 
 import com.example.leavesystem.repository.LeaveApplicationRepository;
+import com.example.leavesystem.repository.LeaveTypeConfigRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,9 @@ import java.util.Map;
 public class StatisticsService {
     @Autowired
     private LeaveApplicationRepository leaveRepository;
+
+    @Autowired
+    private LeaveTypeConfigRepository leaveTypeConfigRepository;
 
     public Map<String, Object> getClassStatistics(String className, LocalDate startDate, LocalDate endDate) {
         Map<String, Object> result = new HashMap<>();
@@ -29,5 +33,9 @@ public class StatisticsService {
 
     public List<Object[]> getAllClassStatistics(LocalDate startDate, LocalDate endDate) {
         return leaveRepository.countApprovedGroupByClass(startDate, endDate);
+    }
+
+    public List<Object[]> getStatisticsByLeaveType(LocalDate startDate, LocalDate endDate) {
+        return leaveRepository.countGroupByLeaveType(startDate, endDate);
     }
 }

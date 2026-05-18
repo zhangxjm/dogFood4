@@ -1,7 +1,9 @@
 package com.example.leavesystem.config;
 
+import com.example.leavesystem.entity.LeaveTypeConfig;
 import com.example.leavesystem.entity.User;
 import com.example.leavesystem.enums.UserRole;
+import com.example.leavesystem.repository.LeaveTypeConfigRepository;
 import com.example.leavesystem.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -12,8 +14,57 @@ public class DataInitializer implements CommandLineRunner {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private LeaveTypeConfigRepository leaveTypeConfigRepository;
+
     @Override
     public void run(String... args) throws Exception {
+        if (leaveTypeConfigRepository.count() == 0) {
+            LeaveTypeConfig sickLeave = new LeaveTypeConfig();
+            sickLeave.setTypeCode("SICK");
+            sickLeave.setTypeName("病假");
+            sickLeave.setDescription("因病请假");
+            sickLeave.setEnabled(true);
+            leaveTypeConfigRepository.save(sickLeave);
+
+            LeaveTypeConfig personalLeave = new LeaveTypeConfig();
+            personalLeave.setTypeCode("PERSONAL");
+            personalLeave.setTypeName("事假");
+            personalLeave.setDescription("因个人事务请假");
+            personalLeave.setEnabled(true);
+            leaveTypeConfigRepository.save(personalLeave);
+
+            LeaveTypeConfig annualLeave = new LeaveTypeConfig();
+            annualLeave.setTypeCode("ANNUAL");
+            annualLeave.setTypeName("年假");
+            annualLeave.setDescription("年度带薪休假");
+            annualLeave.setEnabled(true);
+            leaveTypeConfigRepository.save(annualLeave);
+
+            LeaveTypeConfig officialLeave = new LeaveTypeConfig();
+            officialLeave.setTypeCode("OFFICIAL");
+            officialLeave.setTypeName("公假");
+            officialLeave.setDescription("因公事请假");
+            officialLeave.setEnabled(true);
+            leaveTypeConfigRepository.save(officialLeave);
+
+            LeaveTypeConfig maternityLeave = new LeaveTypeConfig();
+            maternityLeave.setTypeCode("MATERNITY");
+            maternityLeave.setTypeName("产假");
+            maternityLeave.setDescription("产假");
+            maternityLeave.setEnabled(true);
+            leaveTypeConfigRepository.save(maternityLeave);
+
+            LeaveTypeConfig otherLeave = new LeaveTypeConfig();
+            otherLeave.setTypeCode("OTHER");
+            otherLeave.setTypeName("其他");
+            otherLeave.setDescription("其他原因请假");
+            otherLeave.setEnabled(true);
+            leaveTypeConfigRepository.save(otherLeave);
+
+            System.out.println("初始化请假类型完成！");
+        }
+
         if (userRepository.count() == 0) {
             User student1 = new User();
             student1.setUsername("student1");

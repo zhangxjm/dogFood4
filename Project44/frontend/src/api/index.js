@@ -19,3 +19,11 @@ export const exportExcel = () => {
 
 export const getClassStatistics = (params) => request.get('/statistics/class', { params })
 export const getAllClassStatistics = (params) => request.get('/statistics/all-classes', { params })
+export const getStatisticsByLeaveType = (params) => request.get('/statistics/by-leave-type', { params })
+
+export const getAllLeaveTypes = () => request.get('/leave-types')
+export const getEnabledLeaveTypes = () => request.get('/leave-types/enabled')
+export const createLeaveType = (data) => request.post('/leave-types', data)
+export const updateLeaveType = (id, data) => request.put(`/leave-types/${id}`, data)
+export const toggleLeaveType = (id) => request.put(`/leave-types/${id}/toggle`)
+export const deleteLeaveType = (id) => request.delete(`/leave-types/${id}`)

@@ -5,7 +5,7 @@
     <van-form @submit="handleSubmit">
       <van-cell-group inset>
         <van-field
-          v-model="form.leaveType"
+          :value="selectedTypeName"
           is-link
           readonly
           label="请假类型"
@@ -91,32 +91,48 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { showToast } from 'vant'
-import { createLeave } from '../api'
+import { createLeave, getEnabledLeaveTypes } from '../api'
 
 const router = useRouter()
 const loading = ref(false)
 const showTypePicker = ref(false)
 const showStartDate = ref(false)
 const showEndDate = ref(false)
+const leaveTypes = ref([])
 
-const typeColumns = [
-  { text: '病假', value: 'SICK' },
-  { text: '事假', value: 'PERSONAL' },
-  { text: '年假', value: 'ANNUAL' },
-  { text: '其他', value: 'OTHER' }
-]
+const typeColumns = computed(() => {
+  return leaveTypes.value.map(item => ({
+    text: item.typeName,
+    value: item.id
+  }))
+})
 
 const today = new Date()
 const defaultDate = [today.getFullYear(), today.getMonth() + 1, today.getDate()]
 
 const form = reactive({
-  leaveType: '',
+  leaveTypeId: null,
   startDate: null,
   endDate: null,
   reason: ''
+})
+
+const loadLeaveTypes = async () => {
+  try {
+    const res = await getEnabledLeaveTypes()
+    if (res.success !== false) {
+      leaveTypes.value = res
+    }
+  } catch (error) {
+    showToast('加载请假类型失败')
+  }
+}
+
+onMounted(() => {
+  loadLeaveTypes()
 })
 
 const pickerStartDate = ref(defaultDate)
@@ -128,6 +144,12 @@ const startDateText = computed(() => {
 
 const endDateText = computed(() => {
   return form.endDate ? formatDate(form.endDate) : ''
+})
+
+const selectedTypeName = computed(() => {
+  if (!form.leaveTypeId) return ''
+  const type = leaveTypes.value.find(t => t.id === form.leaveTypeId)
+  return type ? type.typeName : ''
 })
 
 const days = computed(() => {
@@ -183,7 +205,7 @@ const openEndPicker = () => {
 }
 
 const onTypeConfirm = ({ selectedOptions }) => {
-  form.leaveType = selectedOptions[0].value
+  form.leaveTypeId = selectedOptions[0].value
   showTypePicker.value = false
 }
 
@@ -201,7 +223,7 @@ const onEndDateConfirm = ({ selectedValues }) => {
 }
 
 const handleSubmit = async () => {
-  if (!form.leaveType) {
+  if (!form.leaveTypeId) {
     showToast('请选择请假类型')
     return
   }
@@ -221,13 +243,13 @@ const handleSubmit = async () => {
   loading.value = true
   try {
     const data = {
-      leaveType: form.leaveType,
+      leaveTypeId: form.leaveTypeId,
       startDate: form.startDate,
       endDate: form.endDate,
       reason: form.reason
     }
     const res = await createLeave(data)
-    if (res.success) {
+    if (res.success !== false) {
       showToast('申请提交成功')
       setTimeout(() => {
         router.replace('/history')

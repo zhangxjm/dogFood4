@@ -49,4 +49,24 @@ public class StatisticsController {
         result.put("data", formattedData);
         return ResponseEntity.ok(result);
     }
+
+    @GetMapping("/by-leave-type")
+    public ResponseEntity<Map<String, Object>> getStatisticsByLeaveType(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        List<Object[]> rawData = statisticsService.getStatisticsByLeaveType(startDate, endDate);
+        
+        List<Map<String, Object>> formattedData = new ArrayList<>();
+        for (Object[] row : rawData) {
+            Map<String, Object> item = new HashMap<>();
+            item.put("leaveType", row[0]);
+            item.put("count", row[1]);
+            formattedData.add(item);
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("success", true);
+        result.put("data", formattedData);
+        return ResponseEntity.ok(result);
+    }
 }

@@ -45,7 +45,8 @@ const menuItems = computed(() => {
   if (user.value?.role === 'TEACHER_FIRST' || user.value?.role === 'TEACHER_SECOND') {
     items.push(
       { path: '/approve', icon: 'passed', text: '审批管理' },
-      { path: '/statistics', icon: 'bar-chart-o', text: '请假统计' }
+      { path: '/statistics', icon: 'bar-chart-o', text: '请假统计' },
+      { path: '/leave-type-config', icon: 'setting-o', text: '类型配置' }
     )
   }
   return items

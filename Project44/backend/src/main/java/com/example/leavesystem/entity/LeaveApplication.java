@@ -1,7 +1,6 @@
 package com.example.leavesystem.entity;
 
 import com.example.leavesystem.enums.LeaveStatus;
-import com.example.leavesystem.enums.LeaveType;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -20,9 +19,9 @@ public class LeaveApplication {
     @JoinColumn(name = "student_id", nullable = false)
     private User student;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private LeaveType leaveType;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "leave_type_id", nullable = false)
+    private LeaveTypeConfig leaveType;
 
     @Column(nullable = false)
     private LocalDate startDate;

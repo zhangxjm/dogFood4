@@ -83,6 +83,10 @@ const getStatusTagType = (status) => {
 }
 
 const getLeaveTypeText = (type) => {
+  if (!type) return '未知'
+  if (typeof type === 'object') {
+    return type.typeName || '未知'
+  }
   const map = {
     'SICK': '病假',
     'PERSONAL': '事假',

@@ -54,4 +54,13 @@ public interface LeaveApplicationRepository extends JpaRepository<LeaveApplicati
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate
     );
+
+    @Query("SELECT la.leaveType, COUNT(la) FROM LeaveApplication la " +
+           "WHERE la.status = com.example.leavesystem.enums.LeaveStatus.APPROVED " +
+           "AND la.startDate >= :startDate AND la.endDate <= :endDate " +
+           "GROUP BY la.leaveType")
+    List<Object[]> countGroupByLeaveType(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
 }

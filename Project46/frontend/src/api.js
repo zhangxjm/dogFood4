@@ -15,11 +15,28 @@ export const serviceApi = {
 };
 
 export const workerApi = {
-  getAll: (skill) => api.get('/workers', { params: { skill } }),
+  getAll: (skill, verifiedOnly) => api.get('/workers', { params: { skill, verifiedOnly } }),
   getById: (id) => api.get(`/workers/${id}`),
   create: (data) => api.post('/workers', data),
   update: (id, data) => api.put(`/workers/${id}`, data),
   delete: (id) => api.delete(`/workers/${id}`),
+};
+
+export const certificationApi = {
+  uploadDocument: (workerId, formData) => 
+    api.post(`/certifications/upload/${workerId}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+  getWorkerCertifications: (workerId) => 
+    api.get(`/certifications/worker/${workerId}`),
+  getPendingAudits: () => 
+    api.get('/certifications/pending'),
+  getAllCertifications: (status) => 
+    api.get('/certifications/all', { params: { status } }),
+  auditCertification: (workerId, data) => 
+    api.put(`/certifications/audit/${workerId}`, data),
+  deleteDocument: (workerId, documentId) => 
+    api.delete(`/certifications/document/${workerId}/${documentId}`),
 };
 
 export const bookingApi = {
